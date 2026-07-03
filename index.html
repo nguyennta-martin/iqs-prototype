@@ -331,17 +331,21 @@
 
       <div class="stat-grid">
         <div class="stat-card"><div class="stat-label" data-en="Total Quotations" data-zh="报价单总数">Total Quotations</div><div class="stat-value">960</div></div>
-        <div class="stat-card"><div class="stat-label" data-en="Accepted" data-zh="已接受">Accepted</div><div class="stat-value" style="color:var(--green);">4</div></div>
-        <div class="stat-card highlight"><div class="stat-label" data-en="Pending Approval" data-zh="待审批">Pending Approval</div><div class="stat-value" style="color:var(--amber);">124</div></div>
+        <div class="stat-card highlight"><div class="stat-label" data-en="From AI Pipeline" data-zh="来自 AI 流程">From AI Pipeline</div><div class="stat-value" id="mgmtIqsCount" style="color:var(--accent);">0</div></div>
+        <div class="stat-card"><div class="stat-label" data-en="Pending Approval" data-zh="待审批">Pending Approval</div><div class="stat-value" id="mgmtPendingCount" style="color:var(--amber);">124</div></div>
         <div class="stat-card"><div class="stat-label" data-en="Accepted Value" data-zh="已接受金额">Accepted Value</div><div class="stat-value" style="color:var(--accent);">$8,100.50</div></div>
       </div>
 
       <div class="search-bar"><span>&#128269;</span><span data-en="Search customer, company, or SKU..." data-zh="搜索客户、公司或 SKU…">Search customer, company, or SKU...</span></div>
 
-      <!-- Dynamic AI-pipeline records (saved drafts + submitted) injected here by JS -->
+      <!-- Dynamic AI-pipeline records injected by renderQuotationMgmt() -->
       <div id="quotationMgmtRecords"></div>
 
-      <!-- Static example — already-submitted record for the quote view demo -->
+      <!-- Empty state — hidden when IQS drafts exist -->
+      <div id="mgmtEmptyState" style="display:none;text-align:center;padding:32px 0;color:var(--text-muted);font-size:13px;">
+        <div style="font-size:28px;margin-bottom:8px;">📋</div>
+        <div data-en="No AI pipeline quotations yet — save a draft from AI Inquiry Drafts to see it here." data-zh="尚无 AI 流程报价单 — 在 AI 询价草稿中保存草稿后将显示于此。">No AI pipeline quotations yet — save a draft from AI Inquiry Drafts to see it here.</div>
+      </div>
       <div class="card" style="cursor:pointer;" onclick="openQuoteView()">
         <div class="draft-title"><span class="draft-customer">Lavinia Limido</span><span class="draft-company">(Ecogeo Srl)</span><span class="status-pill pill-blue" data-en="Pending Sales Review" data-zh="待业务审核">Pending Sales Review</span><span class="origin-tag" data-en="originated from AI Inquiry Drafts" data-zh="源自 AI 询价草稿">originated from AI Inquiry Drafts</span></div>
         <div class="draft-meta">RFQ 1219 · EC8917A(RK-2630) · <span data-en="Quantity" data-zh="数量">Quantity</span>: 50 · EUR 14.28/pc</div>
@@ -644,8 +648,8 @@
       <!-- Section E — Attachment edge cases -->
       <div class="draft-row" data-uc-key="a1" data-mailbox="m2" data-section="E" onclick="openUC('a1')" style="cursor:pointer;">
         <div class="draft-main">
-          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">Lavinia Limido</span><span class="draft-company">(Ecogeo Srl)</span><span class="status-pill pill-green" data-en="Ready for review" data-zh="可供审核">Ready for review</span><span class="mailbox-tag pending">Mailbox 2</span></div>
-          <div class="draft-meta">Mailbox 2 · 2026-06-30 09:55 · No drawing — spec from email body only · Tolerance defaulted to General</div>
+          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">Lavinia Limido</span><span class="draft-company">(Ecogeo Srl)</span><span class="status-pill pill-amber" data-en="Awaiting Client Info" data-zh="待客户补充">Awaiting Client Info</span><span class="mailbox-tag pending">Mailbox 2</span></div>
+          <div class="draft-meta">Mailbox 2 · 2026-06-30 09:55 · DXF attachment — not yet supported · spec extracted from email body · rep notified</div>
           <div class="draft-subject" data-en="&quot;Blade quote — OD 80 × ID 32 × 1mm, 420J2+304, qty 50pcs. No drawing, standard spec.&quot;" data-zh="「刀片报价 — OD 80 × ID 32 × 厚 1mm，420J2+304，50 件。无图纸，标准规格。」">"Blade quote — OD 80 × ID 32 × 1mm, 420J2+304, qty 50pcs. No drawing, standard spec."</div>
         </div>
         <div class="draft-right"><button class="btn btn-sm btn-primary" data-en="Open" data-zh="打开">Open</button></div>
@@ -653,7 +657,7 @@
 
       <div class="draft-row" data-uc-key="a2" data-mailbox="m1" data-section="E" onclick="openUC('a2')" style="cursor:pointer;">
         <div class="draft-main">
-          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">Doug Jones</span><span class="draft-company">(American Cutting Edge)</span><span class="status-pill pill-green" data-en="Ready for review" data-zh="可供审核">Ready for review</span></div>
+          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">Doug Jones</span><span class="draft-company">(American Cutting Edge)</span><span class="status-pill pill-amber" data-en="Awaiting Client Info" data-zh="待客户补充">Awaiting Client Info</span></div>
           <div class="draft-meta">carmen.l@ingear-metal.com · 2026-06-30 11:33 · 3 drawings, attributed to 3 product rows</div>
           <div class="draft-subject" data-en="&quot;3 product inquiry — individual drawings attached for each (drawing01.pdf, drawing02.pdf, drawing03.pdf)&quot;" data-zh="「3 产品询价 — 每款各附一份图纸（drawing01.pdf, drawing02.pdf, drawing03.pdf）」">"3 product inquiry — individual drawings attached for each (drawing01.pdf, drawing02.pdf, drawing03.pdf)"</div>
         </div>
@@ -690,7 +694,7 @@
       <!-- Section F — Client & Mailbox edge cases -->
       <div class="draft-row" data-uc-key="c1" data-mailbox="m1" data-section="F" onclick="openUC('c1')" style="cursor:pointer;">
         <div class="draft-main">
-          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">Kim Tae-yang</span><span class="draft-company">(Seoul Blades Co.)</span><span class="status-pill pill-green" data-en="Ready for review" data-zh="可供审核">Ready for review</span></div>
+          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">Kim Tae-yang</span><span class="draft-company">(Seoul Blades Co.)</span><span class="status-pill pill-amber" data-en="Conflict" data-zh="冲突">Conflict</span></div>
           <div class="draft-meta">carmen.l@ingear-metal.com · 2026-06-30 16:22 · Reply to follow-up — missing fields now supplied</div>
           <div class="draft-subject" data-en="&quot;Re: Missing info for your quote — material HSS M2, quantity 50 pcs, thickness 1.5mm&quot;" data-zh="「Re: 报价所需缺失信息 — 材质 HSS M2，数量 50 件，厚度 1.5mm」">"Re: Missing info for your quote — material HSS M2, quantity 50 pcs, thickness 1.5mm"</div>
         </div>
@@ -746,8 +750,8 @@
 
       <div class="draft-row" data-uc-key="s2" data-mailbox="m2" data-section="F" onclick="openUC('s2')" style="cursor:pointer;">
         <div class="draft-main">
-          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">David Mok</span><span class="draft-company">(NewClient Singapore Pte Ltd)</span><span class="status-pill pill-green" data-en="Ready for review" data-zh="可供审核">Ready for review</span><span class="mailbox-tag pending">Mailbox 2</span></div>
-          <div class="draft-meta">Mailbox 2 · 2026-07-01 09:14 · Forwarded email detected · inner sender extracted · matched to ENQ-NS-2026-001</div>
+          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">David Mok</span><span class="draft-company">(NewClient Singapore Pte Ltd)</span><span class="status-pill pill-amber" data-en="Conflict" data-zh="冲突">Conflict</span><span class="mailbox-tag pending">Mailbox 2</span></div>
+          <div class="draft-meta">Mailbox 2 · 2026-07-01 09:14 · Forwarded email detected (parser before Stage 1) · Revision/Reference · matched to ENQ-NS-2026-001</div>
           <div class="draft-subject" data-en="&quot;Fwd: Re: Blade inquiry — (rep forwarding client reply from personal inbox)&quot;" data-zh="「Fwd: Re: 刀片询价 — 业务员转发来自个人收件箱的客户回复」">"Fwd: Re: Blade inquiry — (rep forwarding client reply from personal inbox)"</div>
         </div>
         <div class="draft-right"><button class="btn btn-sm btn-primary" data-en="Open" data-zh="打开">Open</button></div>
@@ -755,7 +759,7 @@
 
       <div class="draft-row" data-uc-key="s3" data-mailbox="m1" data-section="F" onclick="openUC('s3')" style="cursor:pointer;">
         <div class="draft-main">
-          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">David Mok</span><span class="draft-company">(NewClient Singapore Pte Ltd)</span><span class="status-pill pill-green" data-en="Ready for review" data-zh="可供审核">Ready for review</span></div>
+          <div class="draft-title"><span class="category-tag blade">BLADE</span><span class="draft-customer">David Mok</span><span class="draft-company">(NewClient Singapore Pte Ltd)</span><span class="status-pill pill-amber" data-en="Conflict" data-zh="冲突">Conflict</span></div>
           <div class="draft-meta">carmen.l@ingear-metal.com · 2026-07-01 10:33 · No thread headers · sender match · single open QT from this sender</div>
           <div class="draft-subject" data-en="&quot;Hi, just to add to my earlier inquiry — material is HSS M2, qty 50 pcs&quot;" data-zh="「您好，补充一下我之前的询价 — 材质为 HSS M2，数量 50 件」">"Hi, just to add to my earlier inquiry — material is HSS M2, qty 50 pcs"</div>
         </div>
@@ -914,30 +918,19 @@
           <div class="card-title" data-en="Next steps — Equipment inquiry" data-zh="下一步 — 设备询价">Next steps — Equipment inquiry</div>
           <span class="status-pill pill-green" data-en="Ready for review" data-zh="可供审核">Ready for review</span>
         </div>
-        <div style="background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;padding:12px 14px;font-size:12.5px;margin-bottom:12px;">
+        <div style="background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;padding:12px 14px;font-size:12.5px;">
           <div style="font-weight:600;color:var(--amber);margin-bottom:4px;" data-en="⚠ Costing System handling for equipment is pending confirmation (PRD Open Q)" data-zh="⚠ 设备类报价系统处理方式待确认（PRD 待解问题）">⚠ Costing System handling for equipment is pending confirmation (PRD Open Q)</div>
-          <div style="font-size:12px;color:var(--text-secondary);" data-en="The Costing System repository has not yet confirmed whether equipment pricing is supported. Until confirmed, all equipment inquiries are flagged for manual pricing. The equipment form collects machine type, capacity, and other equipment-specific fields — the rep enters the price manually and submits for approval." data-zh="报价系统仓库尚未确认是否支持设备定价。在确认之前，所有设备询价均标记为人工定价。设备报价单收集机型、产能及其他设备专属字段，由业务员手动输入价格后提交审批。">The Costing System repository has not yet confirmed whether equipment pricing is supported. Until confirmed, all equipment inquiries are flagged for manual pricing. The equipment form collects machine type, capacity, and other equipment-specific fields — the rep enters the price manually and submits for approval.</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-secondary);margin-bottom:0;flex-wrap:wrap;">
-          <span style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;" data-en="Email" data-zh="邮件">Email</span>
-          <span>→</span>
-          <span style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;" data-en="Extract (Equipment category)" data-zh="提取（设备类）">Extract (Equipment category)</span>
-          <span>→</span>
-          <span style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;" data-en="Equipment form" data-zh="设备表单">Equipment form</span>
-          <span>→</span>
-          <span style="background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:5px;padding:2px 8px;color:var(--amber);" data-en="Rep enters price manually" data-zh="业务员手动输入价格">Rep enters price manually</span>
-          <span>→</span>
-          <span style="background:var(--bg-card-2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;" data-en="Submit for Approval" data-zh="提交审批">Submit for Approval</span>
+          <div style="font-size:12px;color:var(--text-secondary);" data-en="The Costing System repository has not yet confirmed whether equipment pricing is supported. Until confirmed, equipment inquiries are flagged for manual pricing. The Equipment Quotation form collects machine type, capacity, and other equipment-specific fields. Rep submits to the Costing System for pricing — or enters a price manually if CS does not support equipment." data-zh="报价系统仓库尚未确认是否支持设备定价。在确认之前，设备询价均标记为人工定价。设备报价单收集机型、产能及其他设备专属字段。业务员提交至报价系统定价，或若报价系统不支持设备定价，则手动输入价格。">The Costing System repository has not yet confirmed whether equipment pricing is supported. Until confirmed, equipment inquiries are flagged for manual pricing. The Equipment Quotation form collects machine type, capacity, and other equipment-specific fields. Rep submits to the Costing System for pricing — or enters a price manually if CS does not support equipment.</div>
         </div>
       </div>
 
       <!-- MIXED action (m1) -->
       <div class="card hidden" id="ucActionMixed">
         <div class="card-header">
-          <div class="card-title" data-en="Split routing — 2 separate quotation drafts needed" data-zh="拆分路由 — 需建立 2 张独立报价草稿">Split routing — 2 separate quotation drafts needed</div>
-          <span class="status-pill pill-amber" data-en="2 items · 2 forms" data-zh="2 项 · 2 张表单">2 items · 2 forms</span>
+          <div class="card-title" data-en="2 separate quotation records — one per product category" data-zh="建立 2 张独立报价单 — 每个产品类别各一张">2 separate quotation records — one per product category</div>
+          <span class="status-pill pill-amber" data-en="2 items · 2 records" data-zh="2 项 · 2 张记录">2 items · 2 records</span>
         </div>
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;" data-en="This email contains a blade product and an equipment product. They use different quotation templates and different pricing flows, so each needs its own draft. Create both drafts from here — they will both appear in Quotation Mgmt and under this inquiry's tracking panel." data-zh="此封邮件同时包含刀片产品与设备产品。两者使用不同的报价模板与定价流程，因此各需独立建立草稿。请在此分别建立两张草稿 — 两张均会出现在报价单管理及此询价的追踪面板中。">This email contains a blade product and an equipment product. They use different quotation templates and different pricing flows, so each needs its own draft. Create both drafts from here — they will both appear in Quotation Mgmt and under this inquiry's tracking panel.</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;" data-en="This email contains a blade product and an equipment product. Per v2 routing rules, mixed inquiries produce two separate quotation records — one per category — each going through its own independent approval workflow. Both records are linked by source_email_id and customer_id so the rep can navigate between them. Create both drafts from here." data-zh="此邮件同时包含刀片产品与设备产品。根据 v2 路由规则，混合询价将产生两张独立报价单 — 每个类别各一张 — 各自经历独立的审批流程。两张记录通过 source_email_id 和 customer_id 关联，业务员可在两张记录间切换。请在此分别建立两张草稿。">This email contains a blade product and an equipment product. Per v2 routing rules, mixed inquiries produce two separate quotation records — one per category — each going through its own independent approval workflow. Both records are linked by source_email_id and customer_id so the rep can navigate between them. Create both drafts from here.</div>
 
         <!-- Item #1 — Blade -->
         <div style="border:1px solid var(--green-border);border-radius:10px;padding:14px;margin-bottom:10px;background:var(--green-dim);">
@@ -1132,7 +1125,7 @@
               <div style="font-size:11.5px;color:var(--text-secondary);">Circular blade OD 80mm · 50 pcs · EUR · Pending Sales Review</div>
               <div style="font-size:11.5px;color:var(--amber);margin-top:3px;" data-en="Change detected: Quantity 50 → 200 pcs" data-zh="检测到变更：数量 50 → 200 件">Change detected: Quantity 50 → 200 pcs</div>
             </div>
-            <button class="btn btn-sm btn-primary" onclick="showPage('page-list')" data-en="Open QT-2640002" data-zh="打开 QT-2640002">Open QT-2640002</button>
+            <button class="btn btn-sm btn-primary" onclick="openUCByEnq('QT-2640002')" data-en="Open QT-2640002" data-zh="打开 QT-2640002">Open QT-2640002</button>
           </div>
         </div>
       </div>
@@ -1155,7 +1148,7 @@
               <div style="font-size:11.5px;color:var(--text-secondary);">Circular blade OD 80mm · 420J2+304 · 1mm · 80 pcs</div>
               <div style="font-size:11.5px;color:var(--amber);margin-top:3px;" data-en="New quantity: 100 pcs (was 80 pcs) — may change pricing tier" data-zh="新数量：100 件（原 80 件）— 可能影响定价阶梯">New quantity: 100 pcs (was 80 pcs) — may change pricing tier</div>
             </div>
-            <button class="btn btn-sm btn-primary" onclick="showPage('page-list')" data-en="Open QT-2639100" data-zh="打开 QT-2639100">Open QT-2639100</button>
+            <button class="btn btn-sm btn-primary" onclick="openUCByEnq('QT-2639100')" data-en="Open QT-2639100" data-zh="打开 QT-2639100">Open QT-2639100</button>
           </div>
         </div>
       </div>
@@ -1179,7 +1172,7 @@
               <div style="font-size:11.5px;color:var(--amber);margin-top:3px;" data-en="Status: Awaiting Client Info — missing: material, quantity" data-zh="状态：待客户补充 — 缺失：材质、数量">Status: Awaiting Client Info — missing: material, quantity</div>
               <div style="font-size:11px;color:var(--text-muted);margin-top:3px;" data-en="Fields supplied in this email: material 420J2+304 · qty 100 pcs — rep updates manually" data-zh="此邮件提供的字段：材质 420J2+304 · 数量 100 件 — 业务员手动更新">Fields supplied in this email: material 420J2+304 · qty 100 pcs — rep updates manually</div>
             </div>
-            <button class="btn btn-sm btn-primary" data-en="Open ENQ-NS-2026-001" data-zh="打开 ENQ-NS-2026-001">Open ENQ-NS-2026-001</button>
+            <button class="btn btn-sm btn-primary" onclick="openUCByEnq('ENQ-NS-2026-001')" data-en="Open ENQ-NS-2026-001" data-zh="打开 ENQ-NS-2026-001">Open ENQ-NS-2026-001</button>
           </div>
         </div>
       </div>
@@ -1194,7 +1187,6 @@
           No thread headers. Stage 2 — Claude detected additive language ("add to my earlier inquiry") + sender has 1 open Awaiting Client Info QT. Classified as <strong>intent: reply</strong>. <strong>proceed_to_extraction = false</strong>. Sender auto-linked at confidence 0.85. No new QT created.
         </div>
         <div style="border:1px solid var(--green-border);border-radius:9px;overflow:hidden;margin-bottom:12px;">
-          <div style="background:var(--green-dim);padding:8px 12px;font-size:11px;font-weight:600;color:var(--green);" data-en="Auto-linked pending inquiry — please confirm or unlink" data-zh="已自动关联待处理询价 — 请确认或取消关联">Auto-linked pending inquiry — please confirm or unlink</div>
           <div style="padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
             <div>
               <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;background:var(--bg-card-2);border:1px solid var(--border-strong);border-radius:5px;padding:2px 7px;color:var(--text-secondary);display:inline-block;margin-bottom:5px;">ENQ-NS-2026-001</div>
@@ -1203,8 +1195,7 @@
               <div style="font-size:11px;color:var(--text-muted);margin-top:3px;" data-en="Fields in this email: material HSS M2 · qty 50 pcs — rep updates ENQ manually" data-zh="此邮件字段：材质 HSS M2 · 数量 50 件 — 业务员手动更新询价">Fields in this email: material HSS M2 · qty 50 pcs — rep updates ENQ manually</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-              <button class="btn btn-sm btn-primary" data-en="Open ENQ-NS-2026-001" data-zh="打开 ENQ-NS-2026-001">Open ENQ-NS-2026-001</button>
-              <button class="btn btn-sm" data-en="Unlink (not this inquiry)" data-zh="取消关联（非此询价）">Unlink</button>
+
             </div>
           </div>
         </div>
@@ -1214,13 +1205,13 @@
       <div class="card hidden" id="ucActionUnknownSender">
         <div class="card-header">
           <div class="card-title outcome-warn" data-en="⚠ Revision / Reference — unknown sender, possible match below threshold" data-zh="⚠ 修订 / 参考 — 未知寄件人，可能匹配低于门槛">⚠ Revision / Reference — unknown sender, possible match below threshold</div>
-          <span class="status-pill pill-amber" data-en="Rep action needed" data-zh="需业务员处理">Rep action needed</span>
+          <span class="status-pill pill-amber" data-en="Revision / Reference" data-zh="修订 / 参考">Revision / Reference</span>
         </div>
         <div style="background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:14px;">
-          Stage 2 — Claude classified as <strong>intent: ambiguous → defaults to REPLY</strong>. Combined match confidence 0.72 — below 0.85 auto-link threshold. A new record was created. System found a possible match and is showing it to the rep for confirmation. Rep is the merge gate.
+          Stage 2 — Claude classified as <strong>intent: ambiguous → defaults to REPLY</strong>. Combined match confidence 0.72 — below 0.85 auto-link threshold. No extraction. Open the referenced inquiry to review, or create a new quotation draft from this email.
         </div>
         <div style="border:1px solid var(--amber-border);border-radius:9px;overflow:hidden;margin-bottom:12px;">
-          <div style="background:var(--amber-dim);padding:8px 12px;font-size:11px;font-weight:600;color:var(--amber);" data-en="Possible match — confidence 0.72 (below auto-link threshold of 0.85)" data-zh="可能匹配 — 置信度 0.72（低于自动关联门槛 0.85）">Possible match — confidence 0.72 (below auto-link threshold of 0.85)</div>
+          <div style="background:var(--amber-dim);padding:8px 12px;font-size:11px;font-weight:600;color:var(--amber);" data-en="Possible reference — confidence 0.72" data-zh="可能参考 — 置信度 0.72">Possible reference — confidence 0.72</div>
           <div style="padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
             <div>
               <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;background:var(--bg-card-2);border:1px solid var(--border-strong);border-radius:5px;padding:2px 7px;color:var(--text-secondary);display:inline-block;margin-bottom:5px;">ENQ-NS-2026-001</div>
@@ -1229,12 +1220,11 @@
               <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Match signals: name "David M." → fuzzy 0.65 · semantic "HSS M2, blades" → 0.72</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-              <button class="btn btn-sm btn-primary" data-en="Yes — link to ENQ-NS-2026-001" data-zh="是 — 关联至 ENQ-NS-2026-001">Yes — link to this</button>
-              <button class="btn btn-sm" data-en="No — keep as new inquiry" data-zh="否 — 保留为新询价">No — keep separate</button>
-              <button class="btn btn-sm" data-en="Add gmail address to David Mok's record" data-zh="将 Gmail 地址添加至 David Mok 记录">Add email alias</button>
+              <button class="btn btn-sm btn-primary" onclick="openUCByEnq('ENQ-NS-2026-001')" data-en="Open ENQ-NS-2026-001" data-zh="打开 ENQ-NS-2026-001">Open ENQ-NS-2026-001</button>
             </div>
           </div>
         </div>
+        <!-- Outcome shown after rep decides -->
       </div>
 
       <!-- QA — MANUAL ENTRY CONFLICT action (Revision/Reference, field-lock, notification only) -->
@@ -1256,7 +1246,7 @@
               <div style="font-size:11.5px;color:var(--amber);margin-top:3px;" data-en="⚠ Material conflict: rep entered HSS M2 · email says HSS M42" data-zh="⚠ 材质冲突：业务员输入 HSS M2 · 邮件显示 HSS M42">⚠ Material conflict: rep entered HSS M2 · email says HSS M42</div>
               <div style="font-size:11px;color:var(--text-muted);margin-top:2px;" data-en="Quantity 80 pcs — applied (field was unlocked)" data-zh="数量 80 件 — 已应用（字段未锁定）">Quantity 80 pcs — applied (field was unlocked)</div>
             </div>
-            <button class="btn btn-sm btn-primary" data-en="Open ENQ-SBC-2026-011" data-zh="打开 ENQ-SBC-2026-011">Open inquiry</button>
+            <button class="btn btn-sm btn-primary" onclick="openUCByEnq('ENQ-SBC-2026-011')" data-en="Open ENQ-SBC-2026-011" data-zh="打开 ENQ-SBC-2026-011">Open inquiry</button>
           </div>
         </div>
       </div>
@@ -1265,13 +1255,13 @@
       <div class="card hidden" id="ucActionNoMatchNew">
         <div class="card-header">
           <div class="card-title outcome-warn" data-en="⚠ Revision / Reference — no match found, rep confirmation needed" data-zh="⚠ 修订 / 参考 — 未找到匹配，需业务员确认">⚠ Revision / Reference — no match found, rep confirmation needed</div>
-          <span class="status-pill pill-amber" data-en="Rep action needed" data-zh="需业务员处理">Rep action needed</span>
+          <span class="status-pill pill-amber" data-en="Revision / Reference" data-zh="修订 / 参考">Revision / Reference</span>
         </div>
         <div style="background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:14px;">
-          Stage 2 — Claude classified as <strong>intent: ambiguous → defaults to REPLY</strong>. All matching strategies below 0.85 threshold (best: semantic 0.68). System never discards — a false separation is recoverable; a wrong merge is harmful. A new record was created. Rep is the merge gate.
+          Stage 2 — Claude classified as <strong>intent: ambiguous → defaults to REPLY</strong>. No confident match found (best: semantic 0.68, below 0.85 threshold). No extraction. Open the possible reference or create a new quotation draft.
         </div>
         <div style="border:1px solid var(--amber-border);border-radius:9px;overflow:hidden;margin-bottom:0;">
-          <div style="background:var(--amber-dim);padding:8px 12px;font-size:11px;font-weight:600;color:var(--amber);" data-en="Possible match — confidence 0.68 (below auto-link threshold)" data-zh="可能匹配 — 置信度 0.68（低于自动关联门槛）">Possible match — confidence 0.68 (below auto-link threshold)</div>
+          <div style="background:var(--amber-dim);padding:8px 12px;font-size:11px;font-weight:600;color:var(--amber);" data-en="Possible reference — confidence 0.68" data-zh="可能参考 — 置信度 0.68">Possible reference — confidence 0.68</div>
           <div style="padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
             <div>
               <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;background:var(--bg-card-2);border:1px solid var(--border-strong);border-radius:5px;padding:2px 7px;color:var(--text-secondary);display:inline-block;margin-bottom:5px;">ENQ-NS-2026-001</div>
@@ -1280,8 +1270,7 @@
               <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Matched on: semantic "following up on OD 80mm blades" (0.68) · "David" name signal</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-              <button class="btn btn-sm btn-primary" data-en="Yes — link to ENQ-NS-2026-001" data-zh="是 — 关联至 ENQ-NS-2026-001">Yes — link to this</button>
-              <button class="btn btn-sm" data-en="No — keep as separate new inquiry" data-zh="否 — 保留为独立新询价">No — keep separate</button>
+              <button class="btn btn-sm btn-primary" onclick="openUCByEnq('ENQ-NS-2026-001')" data-en="Open ENQ-NS-2026-001" data-zh="打开 ENQ-NS-2026-001">Open ENQ-NS-2026-001</button>
             </div>
           </div>
         </div>
@@ -1357,21 +1346,12 @@
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
-          <span class="status-pill pill-purple" data-en="Equipment — Claude classified" data-zh="设备 — Claude 分类结果">Equipment — Claude classified</span>
-          <button class="withdraw-link hidden" id="equipWithdrawLink" onclick="withdrawSubmission('equipment')" data-en="Withdraw & edit again" data-zh="撤回并重新编辑">Withdraw &amp; edit again</button>
+          <span class="status-pill pill-gray" id="equipHeaderStatus" data-en="Draft" data-zh="草稿">Draft</span>
+          <button class="withdraw-link" id="equipWithdrawLink" onclick="withdrawSubmission('equipment')" data-en="Withdraw & edit again" data-zh="撤回并重新编辑">Withdraw &amp; edit again</button>
         </div>
       </div>
 
-      <div id="equipStepperHost"></div>
-
-      <div class="confirm-banner" id="equipConfirmBanner">
-        <div class="ct-title" data-en="Submitted for sales review" data-zh="已提交业务审核">Submitted for sales review</div>
-        <div class="ct-body" data-en="This quotation now leaves the AI pipeline and is tracked in Quotation Mgmt. Approval and PDF generation are existing Blade features — no further AI involvement." data-zh="此报价单已离开 AI 流程，现于报价单管理中追踪。审批与 PDF 生成为 Blade 既有功能，AI 流程到此结束。">This quotation now leaves the AI pipeline and is tracked in Quotation Mgmt. Approval and PDF generation are existing Blade features — no further AI involvement.</div>
-        <div class="ct-actions">
-          <button class="btn btn-sm" onclick="showPage('page-drafts')" data-en="Back to AI Inquiry Drafts" data-zh="返回 AI 询价草稿">Back to AI Inquiry Drafts</button>
-          <button class="btn btn-sm btn-primary" onclick="showPage('page-equip')" data-en="Go to Equipment Quotations" data-zh="前往设备报价单">Go to Equipment Quotations</button>
-        </div>
-      </div>
+      <!-- No stepper or approval workflow for equipment — managed directly in Equipment Quotations -->
 
       <div class="ai-banner">
         <div class="ico">&#10024;</div>
@@ -1454,17 +1434,17 @@
         </div>
       </div>
 
-      <!-- Costing System price card — same pattern as blade, shown after pricing received -->
+      <!-- Costing System result — mirrors blade diffCard, minus approval step -->
       <div class="card hidden fade-in" id="equipDiffCard">
         <div class="card-header">
           <div class="card-title" data-en="Costing System price" data-zh="报价系统定价">Costing System price</div>
-          <span class="status-pill pill-gray" id="equipEstimateRefPill" data-en="Estimate EST-EQUIP-0001" data-zh="估算单 EST-EQUIP-0001">Estimate EST-EQUIP-0001</span>
+          <span class="status-pill pill-green" data-en="Priced — review needed" data-zh="已定价 — 待审核">Priced — review needed</span>
         </div>
-        <p style="font-size:11.5px;color:var(--text-secondary);margin:0 0 12px;" data-en="Blade does not perform its own equipment pricing — this is a direct passthrough from the Costing System's Estimate. You may override the final amount downward only; the reason is recorded in the audit trail." data-zh="Blade 本身不进行设备定价 — 以下为报价系统「预估成本」结果的直接显示。您仅可向下调整最终金额，调整原因将记录于审计日志中。">Blade does not perform its own equipment pricing — this is a direct passthrough from the Costing System's Estimate. You may override the final amount downward only; the reason is recorded in the audit trail.</p>
+        <p style="font-size:11.5px;color:var(--text-secondary);margin:0 0 12px;" data-en="You may override the final amount downward only; the reason is recorded in the audit trail." data-zh="您仅可向下调整最终金额，调整原因将记录于审计日志中。">You may override the final amount downward only; the reason is recorded in the audit trail.</p>
         <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;">
           <table class="diff">
             <tr>
-              <th data-en="Cost breakdown (from Costing System)" data-zh="成本明细（来自报价系统）">Cost breakdown (from Costing System)</th>
+              <th data-en="Cost breakdown (Costing System)" data-zh="成本明细（报价系统）">Cost breakdown (Costing System)</th>
               <th style="text-align:right;" data-en="Amount (HKD)" data-zh="金额（港元）">Amount (HKD)</th>
             </tr>
             <tr><td data-en="Material cost" data-zh="材料成本">Material cost</td><td style="text-align:right;" id="equipCbMaterial">—</td></tr>
@@ -1473,23 +1453,29 @@
             <tr><td data-en="Overhead cost" data-zh="间接成本">Overhead cost</td><td style="text-align:right;" id="equipCbOverhead">—</td></tr>
             <tr style="font-weight:600;"><td data-en="Total estimated cost" data-zh="总估算成本">Total estimated cost</td><td style="text-align:right;" id="equipCbTotal">—</td></tr>
             <tr><td data-en="Profit margin applied" data-zh="已套用利润率">Profit margin applied</td><td style="text-align:right;" id="equipCbMargin">—</td></tr>
-            <tr class="diff-ok" style="font-weight:700;"><td data-en="Suggested price" data-zh="建议售价">Suggested price</td><td style="text-align:right;" class="match" id="equipCostingAmount">—</td></tr>
+            <tr class="diff-ok" style="font-weight:700;"><td data-en="Suggested selling price" data-zh="建议售价">Suggested selling price</td><td style="text-align:right;" id="equipCostingAmount">—</td></tr>
           </table>
         </div>
         <div class="field-grid cols-2">
           <div class="field">
-            <div class="field-label" data-en="Override amount (HKD) — downward only" data-zh="调整金额（港元）— 仅可向下">Override amount (HKD) — downward only</div>
-            <input type="number" id="equipOverrideAmount" step="0.01" placeholder="Leave blank to use suggested price" oninput="onEquipOverrideInput()">
-            <div style="font-size:10.5px;color:var(--red);margin-top:3px;display:none;" id="equipOverrideWarning" data-en="Override cannot exceed the Costing System's suggested price." data-zh="调整金额不可超过报价系统建议售价。">Override cannot exceed the Costing System's suggested price.</div>
+            <div class="field-label"><span data-en="Override amount (HKD) — downward only" data-zh="调整金额（港元）— 仅可向下">Override amount (HKD) — downward only</span></div>
+            <input type="number" step="0.01" id="equipOverrideAmount" placeholder="—" oninput="onEquipOverrideInput()">
+            <div style="font-size:10.5px;color:var(--red);display:none;margin-top:2px;" id="equipOverrideWarning" data-en="Override must be at or below the Costing System's suggested price." data-zh="调整金额不得高于报价系统建议金额。">Override must be at or below the Costing System's suggested price.</div>
           </div>
           <div class="field">
-            <div class="field-label" data-en="Override reason (required if overriding)" data-zh="调整原因（调整时必填）">Override reason (required if overriding)</div>
-            <select id="equipOverrideReason"><option value="">— select if overriding —</option><option>Client negotiation — rep discretion</option><option>Competitor price match</option><option>Volume commitment</option><option>Other</option></select>
+            <div class="field-label"><span data-en="Override reason" data-zh="调整原因">Override reason</span></div>
+            <select id="equipOverrideReason">
+              <option value="" data-en="— select if overriding —" data-zh="— 如有调整请选择 —">— select if overriding —</option>
+              <option data-en="Long-standing customer relationship" data-zh="长期客户关系">Long-standing customer relationship</option>
+              <option data-en="Competitive match" data-zh="符合竞争对手报价">Competitive match</option>
+              <option data-en="Volume commitment" data-zh="客户承诺超出当前数量">Volume commitment</option>
+              <option data-en="Other (see remarks)" data-zh="其他（详见备注）">Other (see remarks)</option>
+            </select>
           </div>
         </div>
         <div class="ack-row" id="equipAckRow" style="margin-top:12px;">
           <input type="checkbox" id="equipAckBox" disabled onchange="onEquipAckChange()">
-          <label for="equipAckBox" data-en="I confirm I have reviewed the Costing System's proposed price (and any override) before submission" data-zh="我确认在提交前已审阅报价系统建议金额（及任何调整）">I confirm I have reviewed the Costing System's proposed price (and any override) before submission</label>
+          <label for="equipAckBox" data-en="I confirm I have reviewed the Costing System's proposed price (and any override)" data-zh="我确认已审阅报价系统建议金额（及任何调整）">I confirm I have reviewed the Costing System's proposed price (and any override)</label>
         </div>
       </div>
 
@@ -1497,9 +1483,11 @@
         <span class="save-toast" id="equipSaveToast">&#10003; Draft saved</span>
         <span style="font-size:11px;color:var(--text-muted);" id="equipSavedAt"></span>
       </div>
-      <div class="footer-actions">
-        <button class="btn" id="equipSaveBtn" onclick="saveDraft('equipment')" data-en="Save draft" data-zh="保存草稿">Save draft</button>
-        <button class="btn btn-primary" id="equipPrimaryActionBtn" onclick="submitEquipmentForReview()" data-en="Submit for Review" data-zh="提交审核">Submit for Review</button>
+      <div class="footer-actions" style="justify-content:flex-end;">
+        <div style="display:flex;gap:8px;">
+          <button class="btn" id="equipSaveBtn" onclick="saveDraft('equipment')" data-en="Save Draft" data-zh="保存草稿">Save Draft</button>
+          <button class="btn btn-primary" id="equipSubmitBtn" onclick="submitEquipToCS()" data-en="Submit for Costing System" data-zh="提交至报价系统">Submit for Costing System</button>
+        </div>
       </div>
     </div>
     <!-- /page-detail-equip -->
@@ -1897,21 +1885,22 @@ function equipPsRowsHtml(){
 var equipItemSeq = 0;
 
 function equipmentItemTemplate(n, prefill){
-  prefill = prefill || { dbValue: '', model: 'FDE500', nameZh: '二維切片切丁機', nameEn: '2D Slicer & Dicer', qty: 1, unitPrice: 0, delivery: '45-60 天' };
+  prefill = prefill || { dbValue: '', model: 'FDE500', nameZh: '2D slicing and dicing machine', nameEn: '2D Slicer & Dicer', qty: 1, unitPrice: 0, delivery: '45-60 days', note: '' };
+  var dbOpts = '<option value="">' + (lang === 'en' ? 'Choosing equipment...' : '選擇設備...') + '</option>' +
+    EQUIPMENT_DB_LIST.map(function(name){
+      var selected = name === prefill.dbValue ? ' selected' : '';
+      return '<option value="' + name + '"' + selected + '>' + name + '</option>';
+    }).join('');
   return '' +
-  '<div class="product-card" data-equip-item="' + n + '">' +
-    '<div class="top">' +
-      '<div class="product-name-row"><span class="item-index">' + (lang === 'en' ? 'Item ' : '項目') + ' ' + n + '</span></div>' +
-      '<div class="top-right"><button class="remove-item-btn" onclick="removeEquipmentItem(this)" title="Remove item">&times;</button></div>' +
+  '<div class="product-card" data-equip-item="' + n + '" style="border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+      '<div style="font-size:13px;font-weight:700;" class="item-index">' + (lang === 'en' ? 'Item ' : '項目 ') + n + '</div>' +
+      '<button class="remove-item-btn" onclick="removeEquipmentItem(this)" title="Remove item" style="background:none;border:none;font-size:18px;color:var(--text-muted);cursor:pointer;line-height:1;">&times;</button>' +
     '</div>' +
 
     '<div class="field" style="margin-bottom:12px;">' +
-      '<div class="field-label"><span data-en="Select from Equipment Database" data-zh="從設備資料庫選擇">Select from Equipment Database</span><span class="sparkle">&#10024;</span></div>' +
-      '<input type="text" class="ai-filled ps-trigger equip-select-input" value="' + prefill.dbValue + '" placeholder="Select equipment... 選擇設備..." onclick="togglePsPanel(this)">' +
-      '<div class="ps-panel">' +
-        '<div class="ps-tabs"><div class="ps-tab active" data-en="Equipment Database" data-zh="設備資料庫">Equipment Database</div></div>' +
-        '<div class="ps-list" style="max-height:260px;">' + equipPsRowsHtml() + '</div>' +
-      '</div>' +
+      '<div class="field-label" style="font-size:11.5px;color:var(--accent);margin-bottom:4px;"><span data-en="Select from the device database" data-zh="從設備資料庫選擇">Select from the device database</span></div>' +
+      '<select class="equip-select-input" onchange="onEquipDbSelect(this)">' + dbOpts + '</select>' +
     '</div>' +
 
     '<div class="field-grid cols-2" style="margin-bottom:12px;">' +
@@ -1921,40 +1910,66 @@ function equipmentItemTemplate(n, prefill){
       '</div>' +
       '<div class="field">' +
         '<div class="field-label"><span data-en="Name (Chinese)" data-zh="名稱（中文）">Name (Chinese)</span><span class="sparkle">&#10024;</span></div>' +
-        '<input type="text" class="ai-filled" value="' + prefill.nameZh + '">' +
+        '<input type="text" class="ai-filled equip-name-zh" value="' + prefill.nameZh + '">' +
       '</div>' +
     '</div>' +
+
     '<div class="field-grid cols-2" style="margin-bottom:12px;">' +
       '<div class="field">' +
         '<div class="field-label"><span data-en="Name (English)" data-zh="名稱（英文）">Name (English)</span><span class="sparkle">&#10024;</span></div>' +
-        '<input type="text" class="ai-filled" value="' + prefill.nameEn + '">' +
+        '<input type="text" class="ai-filled equip-name-en" value="' + prefill.nameEn + '">' +
       '</div>' +
       '<div class="field">' +
         '<div class="field-label"><span data-en="Quantity" data-zh="數量">Quantity</span><span class="required-asterisk">*</span><span class="sparkle">&#10024;</span></div>' +
-        '<input type="number" class="ai-filled equip-qty" data-required="true" value="' + prefill.qty + '">' +
+        '<input type="number" class="ai-filled equip-qty" data-required="true" min="1" value="' + prefill.qty + '" oninput="updateEquipGrandTotal()">' +
       '</div>' +
     '</div>' +
+
     '<div class="field-grid cols-2" style="margin-bottom:12px;">' +
       '<div class="field">' +
-        '<div class="field-label"><span data-en="Unit price (HKD)" data-zh="單價（HKD）">Unit price (HKD)</span></div>' +
-        '<input type="number" class="dashed equip-price" value="' + prefill.unitPrice + '" placeholder="—">' +
+        '<div class="field-label"><span data-en="Unit price (HKD)" data-zh="單價（HKD）">Unit price (HKD). )</span></div>' +
+        '<input type="number" class="dashed equip-price" min="0" value="' + prefill.unitPrice + '" placeholder="0" oninput="updateEquipGrandTotal()">' +
       '</div>' +
       '<div class="field">' +
-        '<div class="field-label"><span data-en="Total" data-zh="總價">Total</span></div>' +
-        '<input type="text" class="dashed equip-total permadisabled" value="0" disabled>' +
+        '<div class="field-label"><span data-en="Total price" data-zh="總價">Total price</span></div>' +
+        '<input type="text" class="equip-total permadisabled" value="0" disabled style="background:var(--bg-card-2);color:var(--text-secondary);">' +
       '</div>' +
     '</div>' +
+
     '<div class="field-grid cols-2">' +
       '<div class="field">' +
         '<div class="field-label"><span data-en="Delivery time" data-zh="交貨期">Delivery time</span><span class="sparkle">&#10024;</span></div>' +
-        '<input type="text" class="ai-filled" value="' + prefill.delivery + '">' +
+        '<input type="text" class="ai-filled equip-delivery" value="' + prefill.delivery + '">' +
       '</div>' +
       '<div class="field">' +
-        '<div class="field-label"><span data-en="Remarks" data-zh="備註">Remarks</span></div>' +
-        '<input type="text" placeholder="—">' +
+        '<div class="field-label"><span data-en="Note" data-zh="備註">Note</span></div>' +
+        '<input type="text" class="equip-note" value="' + (prefill.note || '') + '" placeholder="—">' +
       '</div>' +
     '</div>' +
   '</div>';
+}
+
+function onEquipDbSelect(selectEl){
+  var val = selectEl.value;
+  if (!val) return;
+  var card = selectEl.closest('[data-equip-item]');
+  if (!card) return;
+  // Parse "CODE — Name EN (Name ZH)" format from EQUIPMENT_DB_LIST
+  // e.g. "TK-M-FS-E-0500A1 — TK-Cut Frost Core FS500"
+  var parts = val.split('—');
+  var code = parts[0] ? parts[0].trim() : '';
+  var namePart = parts[1] ? parts[1].trim() : '';
+  // Extract model from code (last segment after last dash)
+  var codeSegs = code.split('-');
+  var modelGuess = codeSegs.length >= 2 ? codeSegs[codeSegs.length - 2] + codeSegs[codeSegs.length - 1] : code;
+  var modelEl = card.querySelector('.equip-model');
+  var nameEnEl = card.querySelector('.equip-name-en');
+  var nameZhEl = card.querySelector('.equip-name-zh');
+  if (modelEl && !modelEl.dataset.manuallyEdited) modelEl.value = modelGuess;
+  if (nameEnEl && !nameEnEl.dataset.manuallyEdited) nameEnEl.value = namePart;
+  if (nameZhEl && !nameZhEl.dataset.manuallyEdited) nameZhEl.value = '';
+  // Mark as auto-filled
+  [modelEl, nameEnEl].forEach(function(el){ if(el){ el.classList.add('ai-filled'); } });
 }
 
 function selectEquipment(rowEl, name){
@@ -1980,12 +1995,16 @@ function updateEquipGrandTotal(){
   var currencyEl = document.getElementById('equipCurrency');
   var currency = currencyEl ? currencyEl.value : 'HKD';
   var total = 0;
-  document.querySelectorAll('#equipmentItems .product-card').forEach(function(card){
-    var qty = parseFloat(card.querySelector('.equip-qty').value) || 0;
-    var price = parseFloat(card.querySelector('.equip-price').value) || 0;
-    total += qty * price;
+  document.querySelectorAll('#equipmentItems [data-equip-item]').forEach(function(card){
+    var qty = parseFloat(card.querySelector('.equip-qty')?.value) || 0;
+    var price = parseFloat(card.querySelector('.equip-price')?.value) || 0;
+    var rowTotal = qty * price;
+    var totalEl = card.querySelector('.equip-total');
+    if (totalEl) totalEl.value = rowTotal ? rowTotal.toLocaleString() : '0';
+    total += rowTotal;
   });
-  document.getElementById('equipTotal').textContent = currency + ' ' + total.toLocaleString();
+  var totalEl = document.getElementById('equipTotal');
+  if (totalEl) totalEl.textContent = currency + ' ' + total.toLocaleString();
 }
 
 function bindEquipItemEvents(card){
@@ -2034,10 +2053,17 @@ var STEPPER_STEPS = [
   { en: 'PDF & Sent', zh: 'PDF 与寄送', tagEn: 'existing feature', tagZh: 'Blade 既有功能' }
 ];
 
-function renderStepper(hostId, currentIndex){
+var EQUIP_STEPPER_STEPS = [
+  { en:'Draft', zh:'草稿' },
+  { en:'Awaiting Costing System', zh:'等待报价系统' },
+  { en:'Priced', zh:'已定价', tagEn:'→ Print / Transfer', tagZh:'→ 打印 / 合同转交' }
+];
+
+function renderStepper(hostId, currentIndex, stepCount){
   var host = document.getElementById(hostId);
   if (!host) return;
-  var html = '<div class="stepper">' + STEPPER_STEPS.map(function(step, i){
+  var steps = (stepCount === 3) ? EQUIP_STEPPER_STEPS : STEPPER_STEPS;
+  var html = '<div class="stepper">' + steps.map(function(step, i){
     var cls = i < currentIndex ? 'done' : (i === currentIndex ? 'current' : '');
     var dotContent = i < currentIndex ? '&#10003;' : (i + 1);
     var tag = step.tagEn ? '<span class="stepper-tag" data-en="' + step.tagEn + '" data-zh="' + step.tagZh + '">' + step.tagEn + '</span>' : '';
@@ -2064,8 +2090,21 @@ function lockFormFields(rootId, lock){
 var quotationDrafts = [];
 var currentDraftId = null; // set when opening an existing draft from Quotation Mgmt
 
+function completeEquipQuotation(){
+  // Save then navigate to Equipment Quotations page
+  saveDraft('equipment');
+  setTimeout(function(){
+    showPage('page-equip');
+    renderEquipQuotations();
+  }, 100);
+}
+
 function makeDraftId(ucKey){
-  return 'QD-' + ucKey.toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  // Equipment drafts use EQQ-YYYYMMDD-NNN format
+  if (quotationContext === 'equipment'){
+    return makeEquipId();
+  }
+  return 'QD-' + (ucKey || 'XX').toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
 }
 
 function updateDraftRowStatus(ucKey, statusText, statusClass, statusZh){
@@ -2079,28 +2118,42 @@ function updateDraftRowStatus(ucKey, statusText, statusClass, statusZh){
 
 function renderQuotationMgmt(){
   var container = document.getElementById('quotationMgmtRecords');
+  var emptyState = document.getElementById('mgmtEmptyState');
   if (!container) return;
   var bladeDrafts = quotationDrafts.filter(function(r){ return r.draftType !== 'equipment'; });
-  if (!bladeDrafts.length){ container.innerHTML = ''; return; }
+
+  // Update stat counters
+  var iqsCount = document.getElementById('mgmtIqsCount');
+  var pendingCount = document.getElementById('mgmtPendingCount');
+  if (iqsCount) iqsCount.textContent = bladeDrafts.length;
+  if (pendingCount){
+    var pending = bladeDrafts.filter(function(r){ return r.status === 'Pending Sales Review'; }).length;
+    pendingCount.textContent = 124 + pending;
+  }
+
+  if (!bladeDrafts.length){ container.innerHTML = ''; if (emptyState) emptyState.style.display = ''; return; }
+  if (emptyState) emptyState.style.display = 'none';
+
   var html = '';
   bladeDrafts.forEach(function(r){
     var pillClass = r.statusClass || 'pill-gray';
     html += [
       '<div class="card" style="cursor:pointer;" onclick="openExistingDraft(\'' + r.id + '\')">',
-        '<div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;">',
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">',
           '<div>',
             '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">',
               '<span style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;background:var(--bg-card-2);border:1px solid var(--border-strong);border-radius:5px;padding:2px 7px;color:var(--text-secondary);">' + r.id + '</span>',
               '<span style="font-size:13px;font-weight:600;">' + r.customer + '</span>',
               '<span style="font-size:12px;color:var(--text-secondary);">&nbsp;(' + r.company + ')</span>',
-              '<span class="origin-tag">from AI Inquiry Drafts</span>',
+              '<span class="origin-tag" data-en="from AI Inquiry Drafts" data-zh="源自 AI 询价草稿">from AI Inquiry Drafts</span>',
             '</div>',
             '<div style="font-size:11.5px;color:var(--text-secondary);">',
               r.enquiryRef + ' &nbsp;&middot;&nbsp; ' + r.product + ' &nbsp;&middot;&nbsp; <span style="color:var(--text-muted);">saved ' + r.savedAt + '</span>',
             '</div>',
           '</div>',
-          '<div style="flex-shrink:0;">',
+          '<div style="flex-shrink:0;display:flex;gap:8px;align-items:center;">',
             '<span class="status-pill ' + pillClass + '">' + r.status + '</span>',
+            '<button class="btn btn-sm" onclick="event.stopPropagation();openExistingDraft(\'' + r.id + '\')" data-en="Open" data-zh="打开">Open</button>',
           '</div>',
         '</div>',
       '</div>'
@@ -2108,6 +2161,7 @@ function renderQuotationMgmt(){
   });
   container.innerHTML = html;
 }
+
 
 // ── Pipeline flow card ──────────────────────────────────────────────────────
 // 5 stages: Receive · Stage 1 Pre-filter · Stage 2 Claude · Action · Outcome
@@ -2120,7 +2174,7 @@ var UC_FLOW = {
   b5:  [{stage:'Receive',label:'Blade mailbox',detail:'carmen.l@ingear-metal.com',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Dimensions in body + drawing attachment detected',status:'ok'},{stage:'Stage 2',label:'intent: new_request',detail:'proceed_to_extraction = true',status:'ok'},{stage:'Extract',label:'Conflict',detail:'OD differs: email body 80mm vs drawing title block 82mm',status:'warn'},{stage:'Outcome',label:'Conflict',detail:'Costing System NOT contacted until rep resolves conflict in form',status:'warn'}],
   e1:  [{stage:'Receive',label:'Mailbox 3',detail:'Pending',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Quote request + equipment keywords detected',status:'ok'},{stage:'Stage 2',label:'intent: new_request',detail:'Self-contained equipment inquiry · proceed_to_extraction = true',status:'ok'},{stage:'Extract',label:'Complete (0.90)',detail:'product_category = equipment · no blade-dimension fields applicable',status:'ok'},{stage:'Outcome',label:'Ready for review',detail:'Costing System NOT contacted (handling TBC) · manual pricing flagged',status:'warn'}],
   e2:  [{stage:'Receive',label:'Mailbox 3',detail:'Pending',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Quote request keyword detected',status:'ok'},{stage:'Stage 2',label:'intent: new_request',detail:'Equipment inquiry · no backward reference · proceed_to_extraction = true',status:'ok'},{stage:'Extract',label:'Incomplete',detail:'Equipment — machine type / capacity / application all unknown',status:'warn'},{stage:'Outcome',label:'Awaiting Client Info',detail:'Equipment-specific follow-up draft generated · rep sends manually',status:'warn'}],
-  m1:  [{stage:'Receive',label:'Blade mailbox',detail:'carmen.l@ingear-metal.com',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Blade dimensions + equipment keyword in 2 numbered items',status:'ok'},{stage:'Stage 2',label:'intent: new_request',detail:'Self-contained dual-category spec · proceed_to_extraction = true',status:'ok'},{stage:'Extract',label:'Mixed (0.91)',detail:'Row 1: Blade (product_category=blade) · Row 2: Equipment',status:'warn'},{stage:'Outcome',label:'Conflict',detail:'Split routing · both rows need price before approval can proceed',status:'warn'}],
+  m1:  [{stage:'Receive',label:'Blade mailbox',detail:'carmen.l@ingear-metal.com',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Blade dimensions + equipment keyword in 2 numbered items → Stage 2',status:'ok'},{stage:'Stage 2',label:'intent: new_request',detail:'Self-contained dual-category spec · proceed_to_extraction = true · extraction in same call',status:'ok'},{stage:'Extract',label:'Mixed (0.91)',detail:'2 structured outputs: QT-1 Blade (OD 200mm / HSS M2 / qty 100) · QT-2 Equipment (grinding machine OD 200mm)',status:'warn'},{stage:'Outcome',label:'2 separate QT records',detail:'Each QT follows its own approval flow · linked by source_email_id + customer_id · both sent to Costing System',status:'warn'}],
   m2:  [{stage:'Receive',label:'Mailbox 4',detail:'Pending',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Dimensions + quantity detected',status:'ok'},{stage:'Stage 2',label:'intent: new_request',detail:'proceed_to_extraction = true (self-contained)',status:'ok'},{stage:'Extract',label:'Ambiguous category',detail:'product_category = unknown · category confidence 0.61 < 0.80 threshold',status:'warn'},{stage:'Outcome',label:'Conflict',detail:'Rep must confirm blade or equipment before routing continues',status:'warn'}],
   cs1: [{stage:'Receive',label:'Mailbox 2',detail:'Pending',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Dimensions + material + quantity + coating',status:'ok'},{stage:'Stage 2',label:'intent: new_request',detail:'Unusual ultra-thin spec · proceed_to_extraction = true',status:'ok'},{stage:'Extract',label:'Complete (0.90)',detail:'All fields extracted · spec unusual (OD 42mm, 0.3mm, TiN)',status:'ok'},{stage:'Outcome',label:'Ready for review',detail:'On submit → Costing System returns null "no match" · rep enters price manually',status:'warn'}],
   cs2: [{stage:'Receive',label:'Mailbox 3',detail:'Pending',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'3 numbered products with dimensions',status:'ok'},{stage:'Stage 2',label:'intent: new_request',detail:'proceed_to_extraction = true',status:'ok'},{stage:'Extract',label:'Complete (0.88)',detail:'3 products · row 2 spec unusual',status:'ok'},{stage:'Outcome',label:'Ready for review',detail:'On submit → CS prices rows 1+3 · row 2 null → rep prices manually',status:'warn'}],
@@ -2136,8 +2190,8 @@ var UC_FLOW = {
   c3:  [{stage:'Receive',label:'Mailbox 2',detail:'Pending',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Dimensions + material + quantity',status:'ok'},{stage:'Stage 2',label:'intent: new_request',detail:'New sender · no open QTs · proceed_to_extraction = true',status:'ok'},{stage:'Extract',label:'Complete (0.86)',detail:'Customer lookup FAILS · auto-create new record (Unverified) · spec extracted',status:'ok'},{stage:'Outcome',label:'Conflict',detail:'Rep must verify new customer before submitting',status:'warn'}],
   c4:  [{stage:'Receive',label:'Blade mailbox',detail:'carmen.l@ingear-metal.com',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'QT reference + "same spec" + new quantity → product signals present',status:'ok'},{stage:'Stage 2',label:'intent: reply / new_request',detail:'Reorder detected · prior_reference_detected = true (QT-2639100) · system pre-fills from prior QT',status:'warn'},{stage:'Action',label:'Pre-fill from QT',detail:'Spec copied from QT-2639100 · rep must confirm before Costing System is contacted',status:'warn'},{stage:'Outcome',label:'Conflict',detail:'New quantity may change pricing tier · rep confirms and submits',status:'warn'}],
   c5:  [{stage:'Receive',label:'Mailbox 4',detail:'Pending',status:'ok'},{stage:'Stage 1',label:'No product signals',detail:'Auto-Submitted header + no dimensions/material/quantity found',status:'skip'},{stage:'Stage 2',label:'N/A — Outcome 4',detail:'No QT/ENQ reference found either → Noise classification · NO Claude call',status:'gray'},{stage:'Action',label:'Skip + log',detail:'Message-ID logged in skip log · classification_reason = "auto-reply"',status:'gray'},{stage:'Outcome',label:'Irrelevant',detail:'No quotation record · no Claude tokens consumed',status:'skip'}],
-  s2:  [{stage:'Receive',label:'Mailbox 2',detail:'From: carmen@personal.com (rep forwarding client reply)',status:'warn'},{stage:'Stage 1',label:'Product signals ✓',detail:'Material + quantity in forwarded body → forwarded email parser fires (3/3 signals: Fwd: prefix + body marker + From=known rep)',status:'ok'},{stage:'Stage 2',label:'intent: reply',detail:'Claude reads inner content · sender = known client with open Awaiting Client Info QT · proceed_to_extraction = false',status:'warn'},{stage:'Action',label:'Revision/Reference',detail:'Match inner sender (david.m@newclient-sg.com) to ENQ-NS-2026-001 · confidence 0.88',status:'warn'},{stage:'Outcome',label:'Ready for review',detail:'Rep shown flagged email + matched QT side-by-side · rep updates manually',status:'ok'}],
-  s3:  [{stage:'Receive',label:'Blade mailbox',detail:'Same sender as ENQ-NS-2026-001',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Material + quantity in fresh email · no thread headers',status:'ok'},{stage:'Stage 2',label:'intent: reply',detail:'Additive language "add to my earlier inquiry" · sender has 1 open Awaiting Client Info QT · proceed_to_extraction = false',status:'warn'},{stage:'Action',label:'Revision/Reference',detail:'Sender match → ENQ-NS-2026-001 · confidence 0.85 · rep confirmation prompt sent',status:'warn'},{stage:'Outcome',label:'Ready for review',detail:'Rep updates quotation manually with new info from this email',status:'ok'}],
+  s2:  [{stage:'Receive',label:'Mailbox 2',detail:'From: carmen@personal.com (Fwd: prefix + forwarded marker + From=known rep → 3/3 signals)',status:'warn'},{stage:'Unwrap',label:'Fwd parser first',detail:'Forwarded email parser fires BEFORE Stage 1 · unwraps inner content · inner From = david.m@newclient-sg.com',status:'ok'},{stage:'Stage 1 + 2',label:'On inner content',detail:'Stage 1: product signals on inner body · Stage 2: Claude reads inner content → intent: reply (additive context)',status:'warn'},{stage:'Match',label:'Inner sender',detail:'david.m@newclient-sg.com → 1 open QT: ENQ-NS-2026-001 (Awaiting Client Info) · confidence 0.88',status:'ok'},{stage:'Outcome',label:'Revision/Reference',detail:'Rep: flagged email + matched QT shown · rep updates ENQ manually',status:'warn'}],
+  s3:  [{stage:'Receive',label:'Blade mailbox',detail:'Same sender as pending ENQ · no thread headers · fresh email',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Material + quantity detected in body → Stage 2',status:'ok'},{stage:'Stage 2',label:'intent: reply',detail:'Claude: "add to my earlier inquiry" = additive phrase signal → REPLY · proceed_to_extraction = false',status:'warn'},{stage:'QT Matching M2',label:'Sender + 1 open QT',detail:'david.m@newclient-sg.com → 1 Awaiting Client Info QT: ENQ-NS-2026-001 · auto-link at conf. 0.85',status:'ok'},{stage:'Outcome',label:'Revision/Reference',detail:'Rep shown ENQ + flagged email · confirms or unlinks · updates ENQ manually',status:'warn'}],
   s4:  [{stage:'Receive',label:'Mailbox 3',detail:'From: david.m@gmail.com (unknown sender)',status:'warn'},{stage:'Stage 1',label:'Product signals ✓',detail:'Material + quantity detected',status:'ok'},{stage:'Stage 2',label:'intent: reply (0.72)',detail:'Additive language · name/semantic match to known client · ambiguous → defaults to REPLY · proceed_to_extraction = false',status:'warn'},{stage:'Action',label:'Revision/Reference + alert',detail:'Combined confidence 0.72 < 0.85 auto-link threshold · new record created · rep disambiguation alert',status:'warn'},{stage:'Outcome',label:'Conflict',detail:'Rep links to existing QT or keeps as new inquiry',status:'warn'}],
   qa:  [{stage:'Receive',label:'Mailbox 2',detail:'Client reply providing corrected field values',status:'ok'},{stage:'Stage 1',label:'Product signals ✓',detail:'Material + quantity in body',status:'ok'},{stage:'Stage 2',label:'intent: reply',detail:'Correction language ("not M2, should be M42") · sender has open QT · proceed_to_extraction = false',status:'warn'},{stage:'Action',label:'Revision/Reference + field-lock',detail:'Rep-entered fields locked (field_locked=true) · AI writes extracted values to ai_parallel_value · conflict on Material detected',status:'warn'},{stage:'Outcome',label:'Conflict',detail:'Non-blocking amber alert · rep resolves Material conflict in form',status:'warn'}],
   qb:  [{stage:'Receive',label:'Mailbox 3',detail:'From: david.m@gmail.com (unknown)',status:'warn'},{stage:'Stage 1',label:'Product signals ✓',detail:'"following up" + product context → Stage 2',status:'ok'},{stage:'Stage 2',label:'intent: ambiguous → REPLY',detail:'Mixed/weak signals · ambiguous defaults to REPLY · proceed_to_extraction = false',status:'warn'},{stage:'Action',label:'Revision/Reference + new record',detail:'No confident match (0.68 < 0.85) · new record created anyway · rep alert shown · false separation recoverable',status:'warn'},{stage:'Outcome',label:'Conflict',detail:'Rep links to existing QT or confirms as new inquiry',status:'warn'}],
@@ -2219,19 +2273,123 @@ function openExistingDraft(draftId){
     setTimeout(function(){
       var equipSaved = document.getElementById('equipSavedAt');
       if (equipSaved) equipSaved.textContent = (lang === 'en' ? 'Resuming saved draft · ' : '继续保存的草稿 · ') + draft.savedAt;
-    }, 50);
+
+      if (draft.csStage === 'priced') setEquipStatus(lang==='en'?'Priced — review needed':'已定价 — 待审核', 'pill-green', true);
+      if (draft.csStage === 'finalised') setEquipStatus(lang==='en'?'Priced':'已定价', 'pill-green', false);
+      if (draft.csStage === 'priced' || draft.csStage === 'finalised'){
+        // Restore CS pricing card
+        document.getElementById('equipCbMaterial').textContent    = 'HKD 12,400';
+        document.getElementById('equipCbLabor').textContent       = 'HKD 3,200';
+        document.getElementById('equipCbEquipment').textContent   = 'HKD 8,500';
+        document.getElementById('equipCbOverhead').textContent    = 'HKD 1,900';
+        document.getElementById('equipCbTotal').textContent       = 'HKD 26,000';
+        document.getElementById('equipCbMargin').textContent      = '25% (+HKD 6,500)';
+        document.getElementById('equipCostingAmount').textContent = 'HKD 32,500';
+        var oa = document.getElementById('equipOverrideAmount');
+        if (oa) oa.setAttribute('data-max','32500');
+        document.getElementById('equipDiffCard').classList.remove('hidden');
+        document.getElementById('equipAckRow').classList.add('enabled');
+
+        if (draft.csStage === 'finalised'){
+          // Already saved to Equipment Quotations — show locked state
+          lockFormFields('page-detail-equip', true);
+          var ack = document.getElementById('equipAckBox');
+          if (ack){ ack.checked = true; ack.disabled = true; }
+          var btn = document.getElementById('equipSubmitBtn');
+          if (btn){ btn.disabled = true; setBilingualText(btn, 'Saved to Equipment Quotations ✓', '已保存至设备报价单 ✓'); btn.onclick = function(){}; }
+        } else {
+          // Priced but not yet finalised — restore ack + withdraw link
+          var ack2 = document.getElementById('equipAckBox');
+          if (ack2){ ack2.checked = false; ack2.disabled = false; }
+          lockFormFields('page-detail-equip', false);
+          var btn2 = document.getElementById('equipSubmitBtn');
+          if (btn2){
+            btn2.disabled = true;
+            setBilingualText(btn2, 'Save to Equipment Quotations', '保存至设备报价单');
+            btn2.onclick = function(){ finaliseEquipQuotation(); };
+          }
+        }
+      }
+    }, 80);
   } else {
     openQuotationDetail('blade', false);
     setTimeout(function(){
-      var headerStatus = document.getElementById('headerStatus');
       var savedAt2 = document.getElementById('bladeSavedAt');
-      if (headerStatus && draft.status === 'Draft'){
-        setBilingualText(headerStatus, 'Draft saved', '草稿已保存');
-        headerStatus.className = 'status-pill pill-gray';
+      if (savedAt2) savedAt2.textContent = (lang === 'en' ? 'Resuming · ' : '继续草稿 · ') + draft.savedAt;
+
+      var stage = draft.bladeStage || 'draft';
+
+      // ── Priced — review needed ──────────────────────────────────────────
+      if (stage === 'priced' || stage === 'submitted'){
+        var cs = draft.csData || {};
+        // Restore CS pricing card
+        document.getElementById('diffCard').classList.remove('hidden');
+        var cb = function(id, val){ var el=document.getElementById(id); if(el) el.textContent=val||'—'; };
+        cb('cbMaterial',  cs.material);
+        cb('cbLabor',     cs.labor);
+        cb('cbEquipment', cs.equipment);
+        cb('cbOverhead',  cs.overhead);
+        cb('cbTotal',     cs.total);
+        cb('cbMargin',    cs.margin);
+        cb('costingAmountField', cs.suggested);
+        document.getElementById('ackRow').classList.add('enabled');
+        document.getElementById('headerSpinner').classList.add('hidden');
+
+        // Restore stepper
+        if (stage === 'priced') renderStepper('bladeStepperHost', 2);
+        if (stage === 'submitted') renderStepper('bladeStepperHost', 3);
+
+        // Restore override if any
+        if (draft.overrideAmount){
+          var oaF = document.getElementById('overrideAmountField');
+          var orF = document.getElementById('overrideReasonField');
+          if (oaF) oaF.value = draft.overrideAmount;
+          if (orF) orF.value = draft.overrideReason || '';
+        }
+
+        if (stage === 'submitted'){
+          // Locked — pending sales review
+          lockFormFields('page-detail', true);
+          var ack = document.getElementById('ackBox');
+          if (ack){ ack.checked = true; ack.disabled = true; }
+          var pBtn = document.getElementById('primaryActionBtn');
+          if (pBtn){ pBtn.disabled = true; setBilingualText(pBtn, 'Submitted — Pending Sales Review', '已提交 — 待业务审核'); }
+          setBilingualText(document.getElementById('headerStatus'), 'Pending Sales Review', '待业务审核');
+          document.getElementById('headerStatus').className = 'status-pill pill-blue';
+          var wl = document.getElementById('withdrawLink'); if (wl) wl.classList.remove('hidden');
+          var bSave = document.getElementById('bladeSaveBtn'); if (bSave) bSave.style.display = 'none';
+        } else {
+          // Priced — editable, waiting for ack
+          lockFormFields('page-detail', false);
+          var ack2 = document.getElementById('ackBox');
+          if (ack2){ ack2.checked = draft.ackDone || false; ack2.disabled = false; }
+          var pBtn2 = document.getElementById('primaryActionBtn');
+          if (pBtn2){
+            pBtn2.disabled = !draft.ackDone;
+            setBilingualText(pBtn2, 'Submit for Approval', '提交审批');
+          }
+          setBilingualText(document.getElementById('headerStatus'), 'Priced — review needed', '已定价 — 待审核');
+          document.getElementById('headerStatus').className = 'status-pill pill-green';
+          var wl2 = document.getElementById('withdrawLink'); if (wl2) wl2.classList.remove('hidden');
+          var bSave2 = document.getElementById('bladeSaveBtn'); if (bSave2) bSave2.style.display = 'none';
+          submissionStage = 'approval';
+        }
+      } else {
+        // Draft — standard edit mode
+        setBilingualText(document.getElementById('headerStatus'), 'Draft saved', '草稿已保存');
+        document.getElementById('headerStatus').className = 'status-pill pill-gray';
+        renderStepper('bladeStepperHost', 0);
       }
-      if (savedAt2) savedAt2.textContent = (lang === 'en' ? 'Resuming saved draft · ' : '继续保存的草稿 · ') + draft.savedAt;
-    }, 50);
+    }, 80);
   }
+}
+
+var equipQtSeq = 0;
+function makeEquipId(){
+  var d = new Date();
+  var ymd = d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2);
+  equipQtSeq++;
+  return 'EQQ-' + ymd + '-' + ('00' + equipQtSeq).slice(-3);
 }
 
 function renderEquipQuotations(){
@@ -2247,21 +2405,32 @@ function renderEquipQuotations(){
   if (emptyState) emptyState.style.display = 'none';
   var html = '';
   equipDrafts.forEach(function(r){
-    var pillClass = r.statusClass || 'pill-gray';
-    html += '<div class="card" style="cursor:pointer;" onclick="openExistingDraft(\'' + r.id + '\')">' +
-      '<div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;">' +
-        '<div>' +
-          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
-            '<span style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;background:var(--bg-card-2);border:1px solid var(--border-strong);border-radius:5px;padding:2px 7px;color:var(--text-secondary);">' + r.id + '</span>' +
-            '<span style="font-size:13px;font-weight:600;">' + r.customer + '</span>' +
-            '<span style="font-size:12px;color:var(--text-secondary);">&nbsp;(' + r.company + ')</span>' +
-            '<span class="origin-tag">from AI Inquiry Drafts</span>' +
-          '</div>' +
-          '<div style="font-size:11.5px;color:var(--text-secondary);">' +
-            r.enquiryRef + ' &nbsp;&middot;&nbsp; ' + r.product + ' &nbsp;&middot;&nbsp; <span style="color:var(--text-muted);">saved ' + r.savedAt + '</span>' +
-          '</div>' +
+    var statusBg = r.status === 'Draft' ? '#f3f4f6' : r.statusClass === 'pill-green' ? '#dcfce7' : '#dbeafe';
+    var statusColor = r.status === 'Draft' ? '#374151' : r.statusClass === 'pill-green' ? '#166534' : '#1e40af';
+    var currency = r.currency || 'HKD';
+    var total = r.total || '0';
+    html += '<div class="card" style="padding:14px 16px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+          '<span style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--text-secondary);background:var(--bg-card-2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;">' + r.id + '</span>' +
+          '<span class="status-pill ' + r.statusClass + '">' + r.status + '</span>' +
+          '<span style="font-size:11.5px;color:var(--text-secondary);">' + currency + ' ' + total + '</span>' +
         '</div>' +
-        '<div style="flex-shrink:0;"><span class="status-pill ' + pillClass + '">' + r.status + '</span></div>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">' +
+          '<button class="btn btn-sm" onclick="openExistingDraft(\'' + r.id + '\')" data-en="Edit" data-zh="編輯">Edit</button>' +
+          '<button class="btn btn-sm" style="font-size:11px;" data-en="Traditional Chinese" data-zh="繁體中文">Traditional Chinese</button>' +
+          '<button class="btn btn-sm" style="font-size:11px;" data-en="Simplified" data-zh="简体中文">Simplified</button>' +
+          '<button class="btn btn-sm" style="font-size:11px;">PT</button>' +
+          '<button class="btn btn-sm" style="font-size:11px;" data-en="Contract transfer" data-zh="合同转交">Contract transfer</button>' +
+          '<button class="btn btn-sm" style="font-size:11px;padding:4px 6px;">&#8964;</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:6px;">' +
+        '<div style="font-size:13.5px;font-weight:600;margin-bottom:2px;">' + r.customer + '</div>' +
+        '<div style="font-size:11.5px;color:var(--text-secondary);">' +
+          (r.enquiryRef && r.enquiryRef !== '—' ? 'Inquiry Number: ' + r.enquiryRef + ' · ' : '') +
+          (r.validity ? 'Valid for ' + r.validity + ' days' : 'Valid for 30 days') +
+        '</div>' +
       '</div>' +
     '</div>';
   });
@@ -2285,16 +2454,29 @@ function saveDraft(type){
 
     if (!currentUCKey) return;
 
-    // Build equipment record
-    var fd = UC_FORM_DATA[currentUCKey] || {};
-    var firstEquipItem = document.querySelector('#equipmentItems .product-card .product-name');
+    // Read from rendered form fields (rep may have edited them)
+    var equipInputs = document.querySelectorAll('#page-detail-equip .card input, #page-detail-equip .card select');
+    var customerVal = equipInputs[0] ? equipInputs[0].value.trim() : '';
+    var companyVal  = equipInputs[1] ? equipInputs[1].value.trim() : '';
+    var enquiryVal  = equipInputs[3] ? equipInputs[3].value.trim() : '';
+    var currencyVal = document.getElementById('equipCurrency') ? document.getElementById('equipCurrency').value : 'HKD';
+    var validityVal = equipInputs[6] ? equipInputs[6].value.trim() : '30';
+    var firstNameEn = document.querySelector('#equipmentItems .equip-name-en');
+    var firstModel  = document.querySelector('#equipmentItems .equip-model');
+    var productVal  = (firstNameEn && firstNameEn.value.trim()) || (firstModel && firstModel.value.trim()) || 'Equipment';
+    var totalEl = document.getElementById('equipTotal');
+    var totalVal = totalEl ? totalEl.textContent.replace(/^[A-Z]+\s*/, '') : '0';
+
     var rec = {
       ucKey: currentUCKey,
       draftType: 'equipment',
-      customer: fd.customer ? fd.customer.split('(')[0].trim() : '—',
-      company: fd.company || '—',
-      enquiryRef: fd.enquiryRef || '—',
-      product: firstEquipItem ? firstEquipItem.textContent.trim() : 'Equipment',
+      customer: customerVal || '—',
+      company:  companyVal  || '—',
+      enquiryRef: enquiryVal || '—',
+      currency: currencyVal,
+      validity: validityVal,
+      total: totalVal,
+      product: productVal,
       status: 'Draft',
       statusClass: 'pill-gray',
       savedAt: dateTimeStr,
@@ -2313,9 +2495,7 @@ function saveDraft(type){
     var hasEquipSubmitted = quotationDrafts.some(function(r){ return r.ucKey === currentUCKey && r.status === 'Pending Sales Review'; });
     if (!hasEquipSubmitted) updateDraftRowStatus(currentUCKey, 'Draft', 'pill-gray', '草稿');
 
-    renderEquipQuotations();
-    renderQuotationMgmt();
-    renderInquiryQuotations(currentUCKey);
+    syncAllViews();
     return;
   }
 
@@ -2366,8 +2546,7 @@ function saveDraft(type){
   var hasSubmitted = quotationDrafts.some(function(r){ return r.ucKey === currentUCKey && r.status === 'Pending Sales Review'; });
   if (!hasSubmitted) updateDraftRowStatus(currentUCKey, 'Draft', 'pill-gray', '草稿');
 
-  renderQuotationMgmt();
-  renderInquiryQuotations(currentUCKey);
+  syncAllViews();
 }
 
 
@@ -2380,8 +2559,7 @@ function discardDraft(type){
   if (currentDraftId){
     quotationDrafts = quotationDrafts.filter(function(r){ return r.id !== currentDraftId; });
     currentDraftId = null;
-    renderQuotationMgmt();
-    if (currentUCKey) renderInquiryQuotations(currentUCKey);
+    syncAllViews();
     // Reset draft row status if no other drafts remain for this inquiry
     var remaining = quotationDrafts.filter(function(r){ return r.ucKey === currentUCKey; });
     if (!remaining.length) updateDraftRowStatus(currentUCKey, 'Awaiting Pricing', 'pill-amber', '待定价');
@@ -2391,23 +2569,31 @@ function discardDraft(type){
 
 function withdrawSubmission(type){
   if (type === 'equipment'){
-    synced = false;
-    document.getElementById('equipWithdrawLink').classList.add('hidden');
-    document.getElementById('equipConfirmBanner').classList.remove('show');
-    var btn = document.getElementById('equipPrimaryActionBtn');
-    btn.disabled = false;
-    setBilingualText(btn, 'Submit for Review', '提交审核');
-    lockFormFields('page-detail-equip', false);
-    renderStepper('equipStepperHost', 0);
-    // Revert draft status → Draft
-    if (currentDraftId){
-      var dIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
-      if (dIdx >= 0){ quotationDrafts[dIdx].status = 'Draft'; quotationDrafts[dIdx].statusClass = 'pill-gray'; }
+    // Withdraw from ANY stage → back to Draft
+    var rec = currentDraftId ? quotationDrafts.find(function(r){ return r.id === currentDraftId; }) : null;
+    if (rec && rec.csStage === 'finalised'){
+      if (!window.confirm('This quotation was already saved to Equipment Quotations. Withdraw and edit again?')) return;
     }
+    lockFormFields('page-detail-equip', false);
+    document.getElementById('equipDiffCard').classList.add('hidden');
+    var ack = document.getElementById('equipAckBox');
+    if (ack){ ack.checked = false; ack.disabled = true; }
+    var ackRow = document.getElementById('equipAckRow');
+    if (ackRow) ackRow.classList.remove('enabled');
+    var oa = document.getElementById('equipOverrideAmount'); if (oa){ oa.value=''; oa.style.borderColor=''; }
+    var oaW = document.getElementById('equipOverrideWarning'); if (oaW) oaW.style.display='none';
+    var or2 = document.getElementById('equipOverrideReason'); if (or2) or2.value='';
+    ['equipCbMaterial','equipCbLabor','equipCbEquipment','equipCbOverhead','equipCbTotal','equipCbMargin','equipCostingAmount'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent='—'; });
+    var btn = document.getElementById('equipSubmitBtn');
+    if (btn){ btn.disabled = false; btn.onclick = function(){ submitEquipToCS(); }; setBilingualText(btn, 'Submit for Costing System', '提交至报价系统'); }
+    var saveBtn = document.getElementById('equipSaveBtn');
+    if (saveBtn){ saveBtn.disabled = false; saveBtn.style.display = ''; setBilingualText(saveBtn, 'Save Draft', '保存草稿'); }
+    if (rec) rec.csStage = null;
+    setEquipStatus(lang==='en'?'Draft':'草稿', 'pill-gray', false);
+    equipGetOrCreateRecord('Draft', 'pill-gray');
+    equipSyncAll('Draft', 'pill-gray', '草稿');
     if (currentUCKey) updateDraftRowStatus(currentUCKey, 'Draft', 'pill-gray', '草稿');
-    renderEquipQuotations();
-    renderQuotationMgmt();
-    if (currentUCKey) renderInquiryQuotations(currentUCKey);
+    syncAllViews();
     return;
   }
   // blade — works from pricing-returned 'approval' OR final 'submitted' stage.
@@ -2422,6 +2608,7 @@ function withdrawSubmission(type){
   lockFormFields('page-detail', false);
   document.getElementById('headerSpinner').classList.add('hidden');
   document.getElementById('ackRow').classList.remove('enabled');
+  var bSave3 = document.getElementById('bladeSaveBtn'); if (bSave3) bSave3.style.display = '';
 
   if (wasSubmitted && pricingWasShown){
     // Withdrawn from Pending Sales Review — pricing result stays visible
@@ -2443,8 +2630,7 @@ function withdrawSubmission(type){
     if (currentDraftId){
       var dIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
       if (dIdx >= 0){ quotationDrafts[dIdx].status = 'Draft'; quotationDrafts[dIdx].statusClass = 'pill-gray'; }
-      renderQuotationMgmt();
-      if (currentUCKey) renderInquiryQuotations(currentUCKey);
+      syncAllViews();
     }
   } else {
     // Withdrawn before or during pricing — full reset
@@ -2460,6 +2646,11 @@ function withdrawSubmission(type){
     pBtn2.disabled = false;
     setBilingualText(pBtn2, 'Submit for Review', '提交审核');
     renderStepper('bladeStepperHost', 0);
+    updateBladeDraftStatus('Draft', 'pill-gray'); syncAllViews();
+    if (currentDraftId){
+      var wIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+      if (wIdx >= 0){ quotationDrafts[wIdx].bladeStage = 'draft'; quotationDrafts[wIdx].ackDone = false; }
+    }
   }
 }
 
@@ -2468,126 +2659,257 @@ function openQuoteView(){
   showPage('page-quote-view');
 }
 
+function setEquipStatus(label, pillClass, showWithdraw){
+  var pill = document.getElementById('equipHeaderStatus');
+  var wl = document.getElementById('equipWithdrawLink');
+  if (pill){ pill.textContent = label; pill.className = 'status-pill ' + pillClass; }
+  if (wl){ wl.style.display = showWithdraw ? '' : 'none'; }
+}
+
 function openEquipmentDetail(){
   quotationContext = 'equipment';
-  equipItemSeq = 1;
-  document.getElementById('equipmentItems').innerHTML = equipmentItemTemplate(1);
-  document.querySelectorAll('#equipmentItems .product-card').forEach(bindEquipItemEvents);
+  equipItemSeq = 0;
+
+  // Init to Draft state — reset all CS pricing elements
+  var fDraft = document.getElementById('equipFooterDraft');
+  var fPriced = document.getElementById('equipFooterPriced');
+  if (fDraft) fDraft.classList.remove('hidden');
+  if (fPriced) fPriced.classList.add('hidden');
+  var submitBtn = document.getElementById('equipSubmitBtn');
+  if (submitBtn){
+    submitBtn.disabled = false;
+    submitBtn.onclick = function(){ submitEquipToCS(); };
+    setBilingualText(submitBtn, 'Submit for Costing System', '提交至报价系统');
+  }
+  var saveBtn2 = document.getElementById('equipSaveBtn');
+  if (saveBtn2){ saveBtn2.disabled = false; saveBtn2.style.display = ''; setBilingualText(saveBtn2, 'Save Draft', '保存草稿'); }
+  setEquipStatus(lang==='en'?'Draft':'草稿', 'pill-gray', false);
+  lockFormFields('page-detail-equip', false);
+  document.getElementById('equipDiffCard').classList.add('hidden');
+  var ack = document.getElementById('equipAckBox');
+  if (ack){ ack.checked = false; ack.disabled = true; }
+  var ackRow = document.getElementById('equipAckRow');
+  if (ackRow) ackRow.classList.remove('enabled');
+  var oa = document.getElementById('equipOverrideAmount'); if (oa){ oa.value=''; oa.style.borderColor=''; }
+  var oaW = document.getElementById('equipOverrideWarning'); if (oaW) oaW.style.display='none';
+  var or2 = document.getElementById('equipOverrideReason'); if (or2) or2.value='';
+  ['equipCbMaterial','equipCbLabor','equipCbEquipment','equipCbOverhead','equipCbTotal','equipCbMargin','equipCostingAmount'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent='—'; }); // 3-step: Draft · Awaiting CS · Priced
+
+  // Determine form data key (m1 equipment gets special m1_equip key)
+  var fdKey = currentUCKey;
+  if (currentUCKey === 'm1') fdKey = 'm1_equip';
+  var fd = UC_FORM_DATA[fdKey] || {};
+
+  // Pre-fill header fields
+  var headerFields = [
+    ['#page-detail-equip input[data-track="ai"]:nth-of-type(1)', 'customer'],  // handled by querySelector below
+  ];
+  // Find inputs by data-track order
+  var inputs = document.querySelectorAll('#page-detail-equip .card input[data-track="ai"], #page-detail-equip .card input:not([data-track])');
+  // Use named setters
+  function setField(selector, value){ var el = document.querySelector(selector); if(el && value !== undefined) el.value = value; }
+
+  // Customer card
+  var allInputs = document.querySelectorAll('#page-detail-equip .card input, #page-detail-equip .card select');
+  // Map by position in the card: [0]=customer, [1]=contact, [2]=address, [3]=enquiryRef, [4]=currency
+  if (allInputs[0]) allInputs[0].value = fd.customer || '';
+  if (allInputs[1]) allInputs[1].value = fd.company ? fd.company.split('(')[0].trim() : (fd.customer || '');
+  if (allInputs[2]) allInputs[2].value = fd.address || '';
+  if (allInputs[3]) allInputs[3].value = fd.enquiryRef || '';
+  // Currency select
+  var currSel = document.getElementById('equipCurrency');
+  if (currSel && fd.currency) currSel.value = fd.currency;
+
+  // Terms card: [5]=tradeTerm, [6]=validity, [7]=paymentTerms, [8]=warrantyTerms
+  if (allInputs[5]) allInputs[5].value = fd.tradeterm || 'FOB';
+  if (allInputs[6]) allInputs[6].value = fd.validity !== undefined ? fd.validity : 30;
+  if (allInputs[7]) allInputs[7].value = fd.paymentTerms || '30% deposit, 70% before shipment';
+  if (allInputs[8]) allInputs[8].value = fd.warrantyTerms || '12 months warranty';
+
+  // Build equipment items
+  var container = document.getElementById('equipmentItems');
+  container.innerHTML = '';
+  var items = (fd.equipItems && fd.equipItems.length) ? fd.equipItems : [{ dbValue:'', model:'', nameZh:'', nameEn:'', qty:1, unitPrice:0, delivery:'', note:'' }];
+  items.forEach(function(item){
+    equipItemSeq++;
+    var wrap = document.createElement('div');
+    wrap.innerHTML = equipmentItemTemplate(equipItemSeq, item);
+    var card = wrap.firstElementChild;
+    container.appendChild(card);
+    bindEquipItemEvents(card);
+  });
+
   updateRemoveEquipButtons();
   updateEquipGrandTotal();
-  var banner = document.getElementById('equipValidationBanner');
-  if (banner) banner.classList.remove('show');
-  var btn = document.getElementById('equipPrimaryActionBtn');
-  if (btn){ btn.disabled = false; setBilingualText(btn, 'Submit for Review', '提交审核'); }
-  lockFormFields('page-detail-equip', false);
-  document.getElementById('equipWithdrawLink').classList.add('hidden');
-  document.getElementById('equipConfirmBanner').classList.remove('show');
-  document.getElementById('equipDiffCard').classList.add('hidden');
-  document.getElementById('equipAckBox').checked = false;
-  document.getElementById('equipAckBox').disabled = true;
-  ['equipCbMaterial','equipCbLabor','equipCbEquipment','equipCbOverhead','equipCbTotal','equipCbMargin'].forEach(function(id){ var el = document.getElementById(id); if(el) el.textContent = '—'; });
-  var ca = document.getElementById('equipCostingAmount'); if (ca) ca.textContent = '—';
-  var oa = document.getElementById('equipOverrideAmount'); if (oa) oa.value = '';
-  renderStepper('equipStepperHost', 0);
-  var eSaved = document.getElementById('equipSavedAt');
-  if (eSaved) eSaved.textContent = '';
   applyLang();
   showPage('page-detail-equip');
 }
 
-function submitEquipmentForReview(){
+function equipGetOrCreateRecord(status, statusClass){
+  // Auto-create draft record if rep submitted without explicitly saving first
+  if (!currentDraftId && currentUCKey){
+    var equipInputs2 = document.querySelectorAll('#page-detail-equip .card input, #page-detail-equip .card select');
+    var customerVal2  = equipInputs2[0] ? equipInputs2[0].value.trim() : '';
+    var companyVal2   = equipInputs2[1] ? equipInputs2[1].value.trim() : '';
+    var enquiryVal2   = equipInputs2[3] ? equipInputs2[3].value.trim() : '';
+    var nameEnEl2  = document.querySelector('#equipmentItems .equip-name-en');
+    var modelEl2   = document.querySelector('#equipmentItems .equip-model');
+    var productVal2 = (nameEnEl2 && nameEnEl2.value.trim()) || (modelEl2 && modelEl2.value.trim()) || 'Equipment';
+    var t = new Date();
+    var ts = t.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) + ' ' + t.toLocaleTimeString('en-GB', {hour12:false, hour:'2-digit', minute:'2-digit'});
+    var newRec = {
+      id: makeDraftId(currentUCKey), ucKey: currentUCKey, draftType: 'equipment',
+      customer:   customerVal2  || '—',
+      company:    companyVal2   || '—',
+      enquiryRef: enquiryVal2   || '—',
+      product:    productVal2,
+      status: status, statusClass: statusClass,
+      savedAt: ts, updatedAt: ts
+    };
+    currentDraftId = newRec.id;
+    quotationDrafts.push(newRec);
+    return;
+  }
+  if (currentDraftId){
+    var dIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+    if (dIdx >= 0){
+      quotationDrafts[dIdx].status = status;
+      quotationDrafts[dIdx].statusClass = statusClass;
+      quotationDrafts[dIdx].updatedAt = new Date().toLocaleTimeString('en-GB', {hour12:false, hour:'2-digit', minute:'2-digit'});
+    }
+  }
+}
+
+function equipSyncAll(ucStatus, ucStatusClass, ucStatusZh){
+  if (currentUCKey) updateDraftRowStatus(currentUCKey, ucStatus, ucStatusClass, ucStatusZh);
+  syncAllViews();
+}
+
+// ── Master sync — call after ANY status change ───────────────────────────────
+// Reads quotationDrafts[] as source of truth and updates all UI surfaces:
+//   AI Inquiry Drafts row · Quotation Mgmt list · Equipment Quotations list
+//   Inquiry tracking panel · (in a real system this would flush to DB here)
+function syncAllViews(){
+  // Re-render both quotation lists
+  renderQuotationMgmt();
+  renderEquipQuotations();
+  // Re-render inquiry tracking panel if a UC is open
+  if (currentUCKey) renderInquiryQuotations(currentUCKey);
+  // Sync the AI Inquiry Drafts row pill from the current draft record
+  if (currentDraftId && currentUCKey){
+    var rec = quotationDrafts.find(function(r){ return r.id === currentDraftId; });
+    if (rec) updateDraftRowStatus(currentUCKey, rec.status, rec.statusClass || 'pill-gray', rec.status);
+  }
+  // Persist to simulated DB (localStorage — same session)
+  try {
+    var snapshot = { drafts: quotationDrafts, ts: Date.now() };
+    sessionStorage.setItem('iqs_quotationDrafts', JSON.stringify(snapshot));
+  } catch(e) {}
+}
+
+function onEquipAckChange(){
+  var ack = document.getElementById('equipAckBox');
+  var btn = document.getElementById('equipSubmitBtn');
+  if (btn) btn.disabled = !ack.checked;
+}
+
+function onEquipOverrideInput(){
+  var field = document.getElementById('equipOverrideAmount');
+  if (!field) return;
+  var warning = document.getElementById('equipOverrideWarning');
+  var max = parseFloat(field.getAttribute('data-max'));
+  var val = parseFloat(field.value);
+  var tooHigh = !isNaN(val) && !isNaN(max) && val > max;
+  if (warning) warning.style.display = tooHigh ? 'block' : 'none';
+  field.style.borderColor = tooHigh ? 'var(--red)' : '';
+}
+
+function submitEquipToCS(){
   var invalid = validateRequired('page-detail-equip');
   var banner = document.getElementById('equipValidationBanner');
   if (invalid.length){
     banner.classList.add('show');
-    if (invalid[0].scrollIntoView) invalid[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (invalid[0].scrollIntoView) invalid[0].scrollIntoView({ behavior:'smooth', block:'center' });
     invalid[0].focus();
     return;
   }
   banner.classList.remove('show');
 
-  // --- 'review' stage: send to Costing System ---
-  if (!document.getElementById('equipDiffCard').classList.contains('hidden') === false &&
-      document.getElementById('equipAckBox').disabled === false &&
-      document.getElementById('equipPrimaryActionBtn').textContent.trim().includes('Approval')){
-    // 'approval' stage
-    var btn2 = document.getElementById('equipPrimaryActionBtn');
-    btn2.disabled = true;
-    setBilingualText(btn2, 'Submitted — Pending Sales Review', '已提交 — 待业务审核');
-    renderStepper('equipStepperHost', 3);
-    document.getElementById('equipWithdrawLink').classList.add('hidden');
-    document.getElementById('equipConfirmBanner').classList.add('show');
-    if (currentUCKey) updateDraftRowStatus(currentUCKey, 'Pending Sales Review', 'pill-blue', '待业务审核');
+  var btn = document.getElementById('equipSubmitBtn');
+  btn.disabled = true;
+  setBilingualText(btn, 'Awaiting Costing System…', '等待报价系统…');
+  var eSave = document.getElementById('equipSaveBtn'); if (eSave) eSave.style.display = 'none';
+  lockFormFields('page-detail-equip', true);
 
-    // Sync equipment draft record → Pending Sales Review
+  setEquipStatus(lang==='en'?'Awaiting Pricing':'等待定价', 'pill-amber', false);
+  // Ensure record exists — status: Awaiting Pricing
+  equipGetOrCreateRecord('Awaiting Pricing', 'pill-amber');
+  equipSyncAll('Awaiting Pricing', 'pill-amber', '等待定价');
+
+  // Costing System call (demo 2s)
+  setTimeout(function(){
+    // Populate CS pricing card
+    document.getElementById('equipCbMaterial').textContent    = 'HKD 12,400';
+    document.getElementById('equipCbLabor').textContent       = 'HKD 3,200';
+    document.getElementById('equipCbEquipment').textContent   = 'HKD 8,500';
+    document.getElementById('equipCbOverhead').textContent    = 'HKD 1,900';
+    document.getElementById('equipCbTotal').textContent       = 'HKD 26,000';
+    document.getElementById('equipCbMargin').textContent      = '25% (+HKD 6,500)';
+    document.getElementById('equipCostingAmount').textContent = 'HKD 32,500';
+    var oa = document.getElementById('equipOverrideAmount');
+    if (oa) { oa.setAttribute('data-max','32500'); oa.value = ''; }
+    var oaWarn = document.getElementById('equipOverrideWarning');
+    if (oaWarn) oaWarn.style.display = 'none';
+    document.getElementById('equipDiffCard').classList.remove('hidden');
+
+    // Ack checkbox enabled, unlock fields (rep can still edit form)
+    var ack = document.getElementById('equipAckBox');
+    ack.checked = false; ack.disabled = false;
+    document.getElementById('equipAckRow').classList.add('enabled');
+    lockFormFields('page-detail-equip', false);
+
+    // Withdraw link visible, submit btn label changes + disabled until ack
+    setBilingualText(btn, 'Save to Equipment Quotations', '保存至设备报价单');
+    btn.disabled = true; // re-enabled by ack
+    btn.onclick = function(){ finaliseEquipQuotation(); };
+
+    // Record: Priced — review needed
     if (currentDraftId){
       var dIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
       if (dIdx >= 0){
-        quotationDrafts[dIdx].status = 'Pending Sales Review';
-        quotationDrafts[dIdx].statusClass = 'pill-blue';
+        quotationDrafts[dIdx].status      = 'Priced — review needed';
+        quotationDrafts[dIdx].statusClass = 'pill-green';
+        quotationDrafts[dIdx].total       = '32,500';
+        quotationDrafts[dIdx].csStage     = 'priced';
       }
-    } else if (currentUCKey) {
-      // Auto-create record if rep never explicitly saved
-      var fd = UC_FORM_DATA[currentUCKey] || {};
-      var t = new Date();
-      var ts = t.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) + ' ' + t.toLocaleTimeString('en-GB', {hour12:false, hour:'2-digit', minute:'2-digit'});
-      var firstEquipItem = document.querySelector('#equipmentItems .product-card .product-name');
-      var newRec = {
-        id: makeDraftId(currentUCKey), ucKey: currentUCKey, draftType: 'equipment',
-        customer: fd.customer ? fd.customer.split('(')[0].trim() : '—',
-        company: fd.company || '—', enquiryRef: fd.enquiryRef || '—',
-        product: firstEquipItem ? firstEquipItem.textContent.trim() : 'Equipment',
-        status: 'Pending Sales Review', statusClass: 'pill-blue',
-        savedAt: ts, updatedAt: ts
-      };
-      currentDraftId = newRec.id;
-      quotationDrafts.push(newRec);
     }
-    renderEquipQuotations();
-    renderQuotationMgmt();
-    if (currentUCKey) renderInquiryQuotations(currentUCKey);
-    return;
-  }
-
-  var btn = document.getElementById('equipPrimaryActionBtn');
-  btn.disabled = true;
-  setBilingualText(btn, 'Awaiting Costing System…', '等待报价系统…');
-  lockFormFields('page-detail-equip', true);
-  renderStepper('equipStepperHost', 1);
-
-  // Background Costing System call
-  setTimeout(function(){
-    // Demo response — equipment pricing received
-    document.getElementById('equipCbMaterial').textContent = 'HKD 12,400';
-    document.getElementById('equipCbLabor').textContent = 'HKD 3,200';
-    document.getElementById('equipCbEquipment').textContent = 'HKD 8,500';
-    document.getElementById('equipCbOverhead').textContent = 'HKD 1,900';
-    document.getElementById('equipCbTotal').textContent = 'HKD 26,000';
-    document.getElementById('equipCbMargin').textContent = '25% (+HKD 6,500)';
-    document.getElementById('equipCostingAmount').textContent = 'HKD 32,500';
-    var oa = document.getElementById('equipOverrideAmount');
-    if (oa) oa.setAttribute('max', '32500');
-    document.getElementById('equipDiffCard').classList.remove('hidden');
-    document.getElementById('equipAckBox').disabled = false;
-    document.getElementById('equipAckRow').classList.add('enabled');
-    renderStepper('equipStepperHost', 2);
-    setBilingualText(btn, 'Submit for Approval', '提交审批');
-    btn.disabled = true; // re-enabled after ack
+    setEquipStatus(lang==='en'?'Priced — review needed':'已定价 — 待审核', 'pill-green', true);
+    equipSyncAll('Priced — review needed', 'pill-green', '已定价 — 待审核');
   }, 2000);
 }
 
-function onEquipOverrideInput(){
-  var field = document.getElementById('equipOverrideAmount');
-  var warning = document.getElementById('equipOverrideWarning');
-  var max = parseFloat(field.getAttribute('max'));
-  var val = parseFloat(field.value);
-  var tooHigh = !isNaN(val) && !isNaN(max) && val > max;
-  warning.style.display = tooHigh ? 'block' : 'none';
-  field.style.borderColor = tooHigh ? 'var(--red)' : '';
-}
+function finaliseEquipQuotation(){
+  // No approval needed — save directly to Equipment Quotations as Priced
+  var btn = document.getElementById('equipSubmitBtn');
+  btn.disabled = true;
+  setBilingualText(btn, 'Saved to Equipment Quotations ✓', '已保存至设备报价单 ✓');
+  setEquipStatus(lang==='en'?'Priced':'已定价', 'pill-green', false);
+  lockFormFields('page-detail-equip', true);
+  document.getElementById('equipAckBox').disabled = true;
 
-function onEquipAckChange(){
-  document.getElementById('equipPrimaryActionBtn').disabled = !document.getElementById('equipAckBox').checked;
+  if (currentDraftId){
+    var dIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+    if (dIdx >= 0){
+      quotationDrafts[dIdx].status      = 'Priced';
+      quotationDrafts[dIdx].statusClass = 'pill-green';
+      quotationDrafts[dIdx].csStage     = 'finalised';
+    }
+  }
+  equipSyncAll('Priced', 'pill-green', '已定价');
+  if (currentUCKey) updateDraftRowStatus(currentUCKey, 'Draft', 'pill-gray', '草稿');
+
+  // Brief confirmation then auto-navigate to Equipment Quotations
+  setTimeout(function(){ showPage('page-equip'); renderEquipQuotations(); }, 1200);
 }
 
 function openQuotationDetail(ctx, isNewReference){
@@ -2599,6 +2921,7 @@ function openQuotationDetail(ctx, isNewReference){
   document.querySelectorAll('#page-detail .input-error').forEach(function(el){ el.classList.remove('input-error'); });
   var pBtn = document.getElementById('primaryActionBtn');
   if (pBtn){ pBtn.disabled = false; setBilingualText(pBtn, 'Submit for Review', '提交审核'); }
+  var bSave2 = document.getElementById('bladeSaveBtn'); if (bSave2) bSave2.style.display = '';
   lockFormFields('page-detail', false);
   document.getElementById('withdrawLink').classList.add('hidden');
   document.getElementById('bladeConfirmBanner').classList.remove('show');
@@ -2793,6 +3116,73 @@ var UC_FORM_DATA = {
     mailbox:'Mailbox 3 (pending)', narrative:'Reorder referencing QT-2639100 — spec pre-filled from that record. New quantity 100 pcs (was 80 pcs). Rep must confirm spec matches client intent before triggering Costing System.',
     tradeterm:'FOB', shipping:'By DHL', grade:'420J2+304',
     items:[{ name:'Circular blade', nameZh:'圆形刀片', ref:'QT-2639100 (reorder)', spec:'OD 80mm / thickness 1mm / 420J2+304 — pre-filled from QT-2639100', specZh:'OD 80mm / 厚度 1mm / 420J2+304 — 从 QT-2639100 预填', qty:100, grade:'420J2+304', leadMin:8, leadMax:10 }]
+  },
+
+  // ── Post-link form data (Revision/Reference cases that become quotation-ready after linking) ──
+  s3: {
+    customer:'David Mok', company:'NewClient Singapore Pte Ltd', email:'david.m@newclient-sg.com',
+    enquiryRef:'ENQ-NS-2026-001', yourRef:'', currency:'USD',
+    mailbox:'carmen.l@ingear-metal.com', narrative:'Material and quantity supplied via follow-up email (linked from S3 case). Rep confirmed link. Spec now complete.',
+    tradeterm:'', shipping:'', grade:'420J2+304',
+    items:[{ name:'Circular blade', nameZh:'圆形刀片', ref:'—', spec:'OD 50mm / HSS M2 / qty 50 pcs', specZh:'OD 50mm / HSS M2 / 50 件', qty:50, grade:'HSS M2', leadMin:6, leadMax:8 }]
+  },
+  s4: {
+    customer:'David Mok', company:'NewClient Singapore Pte Ltd', email:'david.m@gmail.com',
+    enquiryRef:'ENQ-NS-2026-001', yourRef:'', currency:'USD',
+    mailbox:'Mailbox 3 (pending)', narrative:'Linked from S4 case (unknown sender — rep confirmed link after alias add). Material HSS M2, qty 50 pcs from this email.',
+    tradeterm:'', shipping:'', grade:'HSS M2',
+    items:[{ name:'Circular blade', nameZh:'圆形刀片', ref:'—', spec:'OD 50mm / HSS M2 / qty 50 pcs', specZh:'OD 50mm / HSS M2 / 50 件', qty:50, grade:'HSS M2', leadMin:6, leadMax:8 }]
+  },
+  qb: {
+    customer:'David Mok', company:'NewClient Singapore Pte Ltd', email:'david.m@gmail.com',
+    enquiryRef:'ENQ-NS-2026-001', yourRef:'', currency:'USD',
+    mailbox:'Mailbox 3 (pending)', narrative:'Linked from QB case (no match — rep confirmed link). "Following up on OD 80mm blades" — rep to verify full spec in form.',
+    tradeterm:'', shipping:'', grade:'—',
+    items:[{ name:'Circular blade', nameZh:'圆形刀片', ref:'—', spec:'OD 50mm — rep to verify', specZh:'OD 50mm — 业务员核实', qty:1, grade:'—', leadMin:6, leadMax:8 }]
+  },
+
+  // ── Equipment form data ──────────────────────────────────────────────
+  e1: {
+    customer:'Marisol Reyes', company:'Andina Food Machinery', email:'m.reyes@andina-food.co',
+    address:'Av. Providencia 1208, Santiago, Chile',
+    enquiryRef:'EQ-RFQ-0461', yourRef:'', currency:'HKD',
+    mailbox:'Mailbox 3 (pending)',
+    tradeterm:'FOB', validity:30,
+    paymentTerms:'30% deposit, 70% before shipment',
+    warrantyTerms:'12 months warranty',
+    narrative:'Client interested in after-sales support options.',
+    equipItems:[
+      { dbValue:'TK-M-FS-E-0500A1 — TK-Cut Frost Core FS500', model:'FS500', nameZh:'圓刀片開縫機 FS500', nameEn:'Circular Blade Slitting Machine FS500', qty:1, unitPrice:0, delivery:'60-75 days', note:'Suitable for OD up to 300mm — confirm capacity with engineering' }
+    ]
+  },
+
+  e2: {
+    customer:'Erin Belongia-Sanchez', company:'Epic Blade & Industrial Solutions', email:'erin@epicblade.com',
+    address:'',
+    enquiryRef:'', yourRef:'', currency:'HKD',
+    mailbox:'Mailbox 3 (pending)',
+    tradeterm:'FOB', validity:30,
+    paymentTerms:'30% deposit, 70% before shipment',
+    warrantyTerms:'12 months warranty',
+    narrative:'Insufficient information — machine type, capacity, and application all unknown. Follow-up sent.',
+    equipItems:[
+      { dbValue:'', model:'', nameZh:'', nameEn:'', qty:1, unitPrice:0, delivery:'', note:'Awaiting client spec — machine type, OD range, production volume required' }
+    ]
+  },
+
+  // m1 equipment quotation (the equipment portion of the mixed case)
+  m1_equip: {
+    customer:'Erin Belongia-Sanchez', company:'Epic Blade & Industrial Solutions', email:'erin@epicblade.com',
+    address:'',
+    enquiryRef:'RFQ-EBI-2026-022 (Item 2 of 2)', yourRef:'EBI-NP-2026-01', currency:'HKD',
+    mailbox:'carmen.l@ingear-metal.com',
+    tradeterm:'FOB', validity:30,
+    paymentTerms:'30% deposit, 70% before shipment',
+    warrantyTerms:'12 months warranty',
+    narrative:'New production line setup — both blade (QT-1) and grinding machine (QT-2) needed together. See linked blade QT for item 1.',
+    equipItems:[
+      { dbValue:'TK-M-GS-A-2000B1 — TK-Cut Precision+ GS2000', model:'GS2000', nameZh:'自動磨刀機 GS2000', nameEn:'Automatic Grinding Machine GS2000', qty:1, unitPrice:0, delivery:'90-120 days', note:'Capacity: OD 200mm — suitable for item 1 blades. Linked source_email_id: same as blade QT' }
+    ]
   }
 };
 
@@ -2894,7 +3284,7 @@ var UC_DATA = {
 
   b3:  { title:'UC-B3 — Multiple Different Blade Products in One Email', subtitle:'Doug Jones (American Cutting Edge) · Mailbox 2 · 2026-06-30 11:22', status:'Ready for review', statusClass:'pill-green', mailbox:'Mailbox 2 (pending)', from:'Doug Jones <d.jones@americancuttingedge.com>', received:'2026-06-30 11:22', subject:'Hi — quote needed for 2 items: circular blade 60mm HSS M2 + slitting saw 100mm HSS M42', body:'Hi,\n\nPlease quote the following two items:\n\n1. 30 pcs — Circular blade, OD 60mm × ID 20mm × 0.8mm thickness, material HSS M2\n2. 20 pcs — Slitting saw, OD 100mm × bore 22mm × 2mm thickness, material HSS M42\n\nDrawings attached for each item.\n\nThanks,\nDoug Jones\nAmerican Cutting Edge', extractionStatus:'Complete — 2 products (confidence 88%)', extractionClass:'pill-blue', fields:[['Product 1','Circular blade',0.92],['OD / ID / Thickness','60mm / 20mm / 0.8mm',0.88],['Material 1','HSS M2',0.91],['Qty 1','30 pcs',0.97],['Product 2','Slitting saw',0.87],['OD / Bore / Thickness','100mm / 22mm / 2mm',0.85],['Material 2','HSS M42',0.90],['Qty 2','20 pcs',0.97]], classification:{ intent:'new_request', confidence:0.96, intent_reasoning:'Numbered list of distinct products — self-contained spec', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Happy' },
 
-  b4:  { title:'UC-B4 — Blade Inquiry: Incomplete Spec (Missing Mandatory Fields)', subtitle:'Kim Tae-yang (Seoul Blades Co.) · Mailbox 2 · 2026-06-30 10:44', status:'Awaiting Client Info', statusClass:'pill-amber', mailbox:'Mailbox 2 (pending)', from:'Kim Tae-yang <ty.kim@seoulblades.kr>', received:'2026-06-30 10:44', subject:"Could you quote some circular blades? Around 80mm. Attached rough sketch.", body:'Hi,\n\nCould you provide a quote for some circular blades? We need them around 80mm diameter. I have attached a rough sketch.\n\nThanks,\nTae-yang', extractionStatus:'Incomplete — 4 fields missing or confidence <80%', extractionClass:'pill-amber', fields:[['Product','Circular blade',0.88],['OD','~80mm (approximate — "around" detected)',0.52],['ID / Bore',null,0.00],['Thickness',null,0.00],['Material',null,0.00],['Quantity',null,0.00]], followup:'Dear Tae-yang,\n\nThank you for your inquiry. To prepare a quotation for the circular blades, could you please confirm the following missing details:\n\n1. Outer diameter (OD) — exact mm, not approximate\n2. Inner diameter / bore (ID) in mm\n3. Blade thickness in mm\n4. Required quantity\n5. Material grade (e.g. HSS M2, 420J2+304 stainless)\n\nIf you have an engineering drawing, a higher-resolution scan would also be helpful.\n\nBest regards,\nCarmen L.\nIngear Metal & Technology', classification:{ intent:'new_request', confidence:0.89, intent_reasoning:'Product request — incomplete spec but clearly a new inquiry', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Incomplete' },
+  b4:  { title:'UC-B4 — Blade Inquiry: Incomplete Spec (Missing Mandatory Fields)', subtitle:'Kim Tae-yang (Seoul Blades Co.) · Mailbox 2 · 2026-06-30 10:44', status:'Awaiting Client Info', statusClass:'pill-amber', mailbox:'Mailbox 2 (pending)', from:'Kim Tae-yang <ty.kim@seoulblades.kr>', received:'2026-06-30 10:44', subject:"Could you quote some circular blades? Around 80mm. Attached rough sketch.", body:'Hi,\n\nCould you provide a quote for some circular blades? We need them around 80mm diameter. I have attached a rough sketch.\n\nThanks,\nTae-yang', extractionStatus:'Incomplete — 4 fields missing or confidence <80%', extractionClass:'pill-amber', fields:[['Product','Circular blade',0.88],['OD','~80mm (approximate — "around" detected)',0.52],['ID / Bore',null,0.00],['Thickness',null,0.00],['Material',null,0.00],['Quantity',null,0.00]], followup:'Dear Tae-yang,\n\nThank you for your inquiry. To prepare a quotation for the circular blades, could you please confirm the following missing details:\n\n1. Outer diameter (OD) — exact mm, not approximate\n2. Inner diameter / bore (ID) in mm\n3. Blade thickness in mm\n4. Required quantity\n5. Material grade (e.g. HSS M2, 420J2+304 stainless)\n\nIf you have an engineering drawing, a higher-resolution scan would also be helpful.\n\nBest regards,\nCarmen L.\nIngear Metal & Technology', classification:{ intent:'new_request', confidence:0.89, intent_reasoning:'Product request — incomplete spec, clearly new inquiry. Note: when client replies with missing info, that reply will be classified as intent:reply → Revision/Reference, not auto-extracted.', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Incomplete' },
 
   b5:  { title:'UC-B5 — Drawing Conflicts with Email Body', subtitle:'Carlos Mendes (CutTech Portugal) · carmen.l@ingear-metal.com · 2026-06-30 09:15', status:'Conflict', statusClass:'pill-amber', mailbox:'carmen.l@ingear-metal.com', from:'Carlos Mendes <c.mendes@cuttech.pt>', received:'2026-06-30 09:15', subject:'OD 80mm blade inquiry + drawing attached (please use drawing for exact dims)', body:'Hi,\n\nPlease quote for a circular blade, OD 80mm, thickness 2mm. I have attached our drawing — please use the drawing for the exact dimensions as it is more accurate.\n\nThanks,\nCarlos Mendes\nCutTech Portugal', extractionStatus:'Conflict detected on OD field — rep must resolve', extractionClass:'pill-amber', fields:[['Product','Circular blade',0.93],['OD (email body)','80mm',0.92],['OD (drawing title block)','82mm ⚠ CONFLICT',0.91],['Thickness','2mm (consistent)',0.95],['Bore','25mm (drawing only)',0.90],['Material','Not stated','—'],['Quantity','Not stated','—']], classification:{ intent:'new_request', confidence:0.95, intent_reasoning:'Explicit quote request with drawing — self-contained', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Conflict' },
 
@@ -2902,7 +3292,7 @@ var UC_DATA = {
 
   e2:  { title:'UC-E2 — Equipment Inquiry: Insufficient Information', subtitle:'Erin Belongia-Sanchez (Epic Blade) · Mailbox 3 · 2026-06-30 13:05', status:'Awaiting Client Info', statusClass:'pill-amber', mailbox:'Mailbox 3 (pending)', from:'Erin Belongia-Sanchez <erin@epicblade.com>', received:'2026-06-30 13:05', subject:'Hi, do you have machines for blade processing? Let me know what you have.', body:'Hi,\n\nDo you have machines for blade processing? Let me know what you have available.\n\nErin Belongia-Sanchez\nEpic Blade & Industrial Solutions', extractionStatus:'Incomplete — Equipment (all fields unresolved)', extractionClass:'pill-amber', fields:[['Category','Equipment',0.84],['Machine type','Unknown',0.00],['Capacity / application','Unknown',0.00],['Production volume','Unknown',0.00]], followup:'Dear Erin,\n\nThank you for reaching out. To help us provide the right equipment recommendation and quotation, could you please share:\n\n1. What type of blade processing are you looking for? (e.g. slitting, sharpening, grinding)\n2. What blade sizes will the machine need to handle? (OD range)\n3. What is your expected production volume?\n4. Do you have any specific technical requirements?\n\nBest regards,\nCarmen L.\nIngear Metal & Technology', classification:{ intent:'new_request', confidence:0.82, intent_reasoning:'Equipment inquiry — new contact, no open QTs', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Incomplete' },
 
-  m1:  { title:'UC-M1 — Mixed Inquiry: Blade + Equipment in One Email', subtitle:'Erin Belongia-Sanchez (Epic Blade) · carmen.l@ingear-metal.com · 2026-06-30 16:01', status:'Conflict', statusClass:'pill-amber', mailbox:'carmen.l@ingear-metal.com', from:'Erin Belongia-Sanchez <erin@epicblade.com>', received:'2026-06-30 16:01', subject:'100pcs circular blades OD 200mm HSS M2 + one automatic grinding machine for new production line', body:'Dear Carmen,\n\nWe are setting up a new production line and need the following:\n\n1. 100 pcs — Circular blades, OD 200mm × bore 32mm × 2mm thickness, HSS M2. Please quote.\n2. One automatic grinding machine suitable for these blades.\n\nBoth items are needed for the same production line, so we would appreciate coordinated lead times.\n\nBest regards,\nErin', extractionStatus:'Complete — 2 items, mixed category', extractionClass:'pill-blue', fields:[['Item 1 category','Blade',0.95],['Item 1 spec','OD 200mm / bore 32mm / 2mm / HSS M2, qty 100',0.91],['Item 2 category','Equipment — grinding machine',0.88],['Item 2 spec','Capacity: OD 200mm blades',0.85],['Narrative','Both items for same production line','—']], classification:{ intent:'new_request', confidence:0.95, intent_reasoning:'Two distinct product line items — self-contained dual-category spec', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Mixed' },
+  m1:  { title:'UC-M1 — Mixed Inquiry: Blade + Equipment in One Email', subtitle:'Erin Belongia-Sanchez (Epic Blade) · carmen.l@ingear-metal.com · 2026-06-30 16:01', status:'Conflict', statusClass:'pill-amber', mailbox:'carmen.l@ingear-metal.com', from:'Erin Belongia-Sanchez <erin@epicblade.com>', received:'2026-06-30 16:01', subject:'100pcs circular blades OD 200mm HSS M2 + one automatic grinding machine for new production line', body:'Dear Carmen,\n\nWe are setting up a new production line and need the following:\n\n1. 100 pcs — Circular blades, OD 200mm × bore 32mm × 2mm thickness, HSS M2. Please quote.\n2. One automatic grinding machine suitable for these blades.\n\nBoth items are needed for the same production line, so we would appreciate coordinated lead times.\n\nBest regards,\nErin', extractionStatus:'Complete — 2 items → 2 separate QT records created (Blade + Equipment)', extractionClass:'pill-amber', fields:[['Outcome (v2)','2 separate quotation records — one per product category','—'],['QT-1 — Blade','OD 200mm / bore 32mm / 2mm / HSS M2 / qty 100 → Blade Quotation form → Costing System',0.91],['QT-2 — Equipment','Grinding machine / capacity OD 200mm → Equipment Quotation form → Costing System',0.88],['Linked by','source_email_id + customer_id shared on both records','—'],['Narrative','Both items for same production line — preserved on both QTs',0.95],['Approval','Each QT follows its own independent approval workflow','—']], classification:{ intent:'new_request', confidence:0.95, intent_reasoning:'Two distinct product line items — self-contained dual-category spec', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Mixed' },
 
   m2:  { title:'UC-M2 — Ambiguous Category: Cannot Classify with Confidence', subtitle:'Robert Fischer (EuroBlade GmbH) · Mailbox 4 · 2026-06-30 12:38', status:'Conflict', statusClass:'pill-amber', mailbox:'Mailbox 4 (pending)', from:'Robert Fischer <r.fischer@euroblade.de>', received:'2026-06-30 12:38', subject:'Can you quote for a cutting assembly? OD 150mm, 3mm thick, HSSCo8, qty 5 units', body:'Hi,\n\nCan you quote for a cutting assembly for our production machine? We need:\n\n• OD 150mm\n• 3mm thick\n• Material: HSSCo8\n• Qty: 5 units\n\nPlease let me know if you need more details.\n\nRobert Fischer\nEuroBlade GmbH', extractionStatus:'Category confidence 61% — below 0.80 threshold', extractionClass:'pill-amber', fields:[['Description','Cutting assembly (blade or equipment component?)',0.61],['OD','150mm',0.90],['Thickness','3mm',0.90],['Material','HSSCo8',0.88],['Quantity','5 units',0.95]], classification:{ intent:'new_request', confidence:0.83, intent_reasoning:'Self-contained pricing request — category ambiguous but no backward reference', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Ambiguous' },
 
@@ -2916,7 +3306,7 @@ var UC_DATA = {
 
   a1:  { title:'UC-A1 — No Attachment: Spec in Email Body Only', subtitle:'Lavinia Limido (Ecogeo Srl) · Mailbox 2 · 2026-06-30 09:55', status:'Ready for review', statusClass:'pill-green', mailbox:'Mailbox 2 (pending)', from:'Lavinia Limido <l.limido@ecogeo.it>', received:'2026-06-30 09:55', subject:'Blade quote — OD 80 × ID 32 × 1mm, 420J2+304, qty 50pcs. No drawing, standard spec.', body:'Hi Carmen,\n\nQuick enquiry — we need 50pcs of circular blades, OD 80mm × ID 32mm × 1mm thickness, material 420J2+304 stainless. No drawing — standard spec. Please quote EXW.\n\nThanks,\nLavinia', extractionStatus:'Complete — text only, no drawing (confidence 96%)', extractionClass:'pill-green', fields:[['Product','Circular blade',0.95],['OD / ID / Thickness','80mm / 32mm / 1mm',0.96],['Material','420J2+304',0.97],['Quantity','50 pcs',0.98],['Trade term','EXW',0.99],['Tolerance','General tolerance (default — no drawing)','—'],['Note','Specification from email body only — no drawing attached','—']], classification:{ intent:'new_request', confidence:0.98, intent_reasoning:'Explicit RFQ — complete spec from email body, no backward reference', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Happy' },
 
-  a2:  { title:'UC-A2 — Multiple Drawings: Different Products', subtitle:'Doug Jones (American Cutting Edge) · carmen.l@ingear-metal.com · 2026-06-30 11:33', status:'Ready for review', statusClass:'pill-green', mailbox:'carmen.l@ingear-metal.com', from:'Doug Jones <d.jones@americancuttingedge.com>', received:'2026-06-30 11:33', subject:'3 product inquiry — individual drawings attached for each (drawing01.pdf, drawing02.pdf, drawing03.pdf)', body:'Hi,\n\nPlease quote for 3 products — drawings attached one per item:\n\n1. Circular blade — see drawing01.pdf\n2. Slitting saw — see drawing02.pdf\n3. Pentagonal knife — see drawing03.pdf\n\nQty: 20 pcs each. Material per drawing.\n\nDouglas Jones\nAmerican Cutting Edge, div of CB Mfg.', extractionStatus:'Complete — 3 drawings attributed to 3 rows', extractionClass:'pill-green', fields:[['Product 1','Circular blade — drawing01.pdf (OD 80mm, 420J2+304)',0.93],['Product 2','Slitting saw — drawing02.pdf (OD 100mm, HSS M2)',0.91],['Product 3','Pentagonal knife — drawing03.pdf (OD 60mm, D2)',0.89],['Qty (all)','20 pcs each',0.97],['Attribution method','Drawing title block — part name matched to product sequence','—']], classification:{ intent:'new_request', confidence:0.96, intent_reasoning:'Multi-product RFQ with individual drawings — self-contained', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Happy' },
+  a2:  { title:'UC-A2 — Multiple Drawings: Different Products', subtitle:'Doug Jones (American Cutting Edge) · carmen.l@ingear-metal.com · 2026-06-30 11:33', status:'Awaiting Client Info', statusClass:'pill-amber', mailbox:'carmen.l@ingear-metal.com', from:'Doug Jones <d.jones@americancuttingedge.com>', received:'2026-06-30 11:33', subject:'3 product inquiry — individual drawings attached for each (drawing01.pdf, drawing02.pdf, drawing03.pdf)', body:'Hi,\n\nPlease quote for 3 products — drawings attached one per item:\n\n1. Circular blade — see drawing01.pdf\n2. Slitting saw — see drawing02.pdf\n3. Pentagonal knife — see drawing03.pdf\n\nQty: 20 pcs each. Material per drawing.\n\nDouglas Jones\nAmerican Cutting Edge, div of CB Mfg.', extractionStatus:'Complete — 3 drawings attributed to 3 rows', extractionClass:'pill-green', fields:[['Product 1','Circular blade — drawing01.pdf (OD 80mm, 420J2+304)',0.93],['Product 2','Slitting saw — drawing02.pdf (OD 100mm, HSS M2)',0.91],['Product 3','Pentagonal knife — drawing03.pdf (OD 60mm, D2)',0.89],['Qty (all)','20 pcs each',0.97],['Attribution method','Drawing title block — part name matched to product sequence','—']], classification:{ intent:'new_request', confidence:0.96, intent_reasoning:'Multi-product RFQ with individual drawings — self-contained', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'Happy' },
 
   a3:  { title:'UC-A3 — DXF File Attached', subtitle:'Dmitri Volkov (RusCut Engineering) · Mailbox 3 · 2026-06-30 14:55', status:'Awaiting Client Info', statusClass:'pill-amber', mailbox:'Mailbox 3 (pending)', from:'Dmitri Volkov <d.volkov@ruscut.ru>', received:'2026-06-30 14:55', subject:'Blade RFQ — DXF file attached (our CAD drawing), no PDF version available', body:'Hello,\n\nPlease quote for a custom blade as per our DXF drawing attached. No PDF version is available at the moment.\n\n• Quantity: 50 pcs\n• Material: D2 tool steel\n\nDmitri Volkov\nRusCut Engineering', extractionStatus:'Partial — email body extracted, DXF cannot be read', extractionClass:'pill-amber', fields:[['Attachment','blade_spec.dxf (2.4 MB) — CANNOT be processed by Claude','—'],['Quantity (email body)','50 pcs',0.97],['Material (email body)','D2 tool steel',0.90],['OD / dimensions','Not extractable — DXF only, no PDF provided',0.00],['DXF file status','Stored in OSS — linked to this record for manual review','—']], classification:{ intent:'new_request', confidence:0.94, intent_reasoning:'Quote request with DXF — no backward reference', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:true }, action:'DXF' },
 
@@ -2936,17 +3326,39 @@ var UC_DATA = {
 
   c6:  { title:'UC-C4 — Reorder: Same as Previous Order', subtitle:'Henrik Olsen (Nordic Cutting Tools AB) · Mailbox 3 · 2026-06-30 17:10', status:'Conflict', statusClass:'pill-amber', mailbox:'Mailbox 3 (pending)', from:'Henrik Olsen <h.olsen@nordic-cuttingtools.se>', received:'2026-06-30 17:10', subject:'Please reorder same blades as QT-2639100, we need 100 pcs this time', body:'Hi,\n\nCould you please reorder the same blades from our last order (QT-2639100)? We need 100 pcs this time.\n\nHenrik Olsen\nNordic Cutting Tools AB', extractionStatus:'Reorder detected — spec pre-filled from QT-2639100', extractionClass:'pill-amber', fields:[['Referenced quotation','QT-2639100',0.98],['Reorder intent','Same spec (not a revision)',0.91],['New quantity','100 pcs (vs. original 80 pcs)',0.97],['Spec pre-filled','OD 80mm, 420J2+304, 1mm — from QT-2639100','—'],['Costing System','Queued — new call with qty 100 (may change pricing tier)','—']], classification:{ intent:'reply', confidence:0.88, intent_reasoning:'Reorder signal: QT-2639100 reference + "same" + new quantity → prior_reference_detected=true → Revision/Reference', prior_reference_detected:true, prior_reference_value:'QT-2639100', proceed_to_extraction:false }, action:'Reorder' },
 
-  s2:  { title:'UC-S2 — Forwarded Email: Rep Forwards Client Reply to Blade', subtitle:'David Mok (NewClient Singapore Pte Ltd) · Mailbox 2 · 2026-07-01 09:14', status:'Ready for review', statusClass:'pill-green', mailbox:'Mailbox 2 (pending)', from:'carmen@personal.com (rep forwarding)', received:'2026-07-01 09:14', subject:'Fwd: Re: Blade inquiry — (rep forwarding client reply from personal inbox)', body:'---------- Forwarded message ----------\nFrom: david.m@newclient-sg.com\nDate: 1 July 2026\nSubject: Re: Blade inquiry\nTo: carmen@personal.com\n\nHi Carmen,\n\nMaterial is 420J2+304 stainless, quantity 100 pcs.\n\nDavid Mok\nNewClient Singapore Pte Ltd', extractionStatus:'Forwarded email detected — inner content extracted at 94%', extractionClass:'pill-green', fields:[['Outer From (envelope)','carmen@personal.com (rep)','—'],['Forward detected','Yes — 3/3 signals: Fwd: prefix, forwarded marker, From = known rep email','—'],['Inner From','david.m@newclient-sg.com','—'],['Inner body — Material','420J2+304',0.94],['Inner body — Quantity','100 pcs',0.97],['Match result','Linked to ENQ-NS-2026-001 (only open inquiry from this sender)','0.88'],['Note','System always checks inner sender, not outer envelope, for customer matching','—']], classification:{ intent:'reply', confidence:0.91, intent_reasoning:'Forwarded email: Fwd: prefix + body marker + From=known rep → inner sender david.m@newclient-sg.com → Claude classifies as reply to ENQ-NS-2026-001', prior_reference_detected:true, prior_reference_value:'ENQ-NS-2026-001', proceed_to_extraction:false }, action:'Forwarded' },
+  s2:  { title:'UC-S2 — Forwarded Email: Rep Forwards Client Reply to Blade', subtitle:'David Mok (NewClient Singapore Pte Ltd) · Mailbox 2 · 2026-07-01 09:14', status:'Conflict', statusClass:'pill-amber', mailbox:'Mailbox 2 (pending)', from:'carmen@personal.com (rep forwarding)', received:'2026-07-01 09:14', subject:'Fwd: Re: Blade inquiry — (rep forwarding client reply from personal inbox)', body:'---------- Forwarded message ----------\nFrom: david.m@newclient-sg.com\nDate: 1 July 2026\nSubject: Re: Blade inquiry\nTo: carmen@personal.com\n\nHi Carmen,\n\nMaterial is 420J2+304 stainless, quantity 100 pcs.\n\nDavid Mok\nNewClient Singapore Pte Ltd', extractionStatus:'Forwarded email detected (parser fires before Stage 1) — inner sender matched → Revision/Reference', extractionClass:'pill-amber', fields:[['Outer From','carmen@personal.com (rep) → 3/3 fwd signals → parser fires BEFORE Stage 1','—'],['Unwrap','Inner From: david.m@newclient-sg.com · Inner subject: Re: Blade inquiry','—'],['Stage 1 (inner)','Product signals on inner body: material + quantity → Stage 2','—'],['Stage 2 (inner)','Claude reads inner content → intent: reply (additive + sender match) · proceed_to_extraction = false','—'],['QT matching','Inner sender → ENQ-NS-2026-001 (only open QT from this sender) · confidence 0.88','0.88'],['Outcome','Revision/Reference · rep shown flagged email + ENQ side-by-side · updates ENQ manually','—']], classification:{ intent:'reply', confidence:0.91, intent_reasoning:'Forwarded email: Fwd: prefix + body marker + From=known rep → inner sender david.m@newclient-sg.com → Claude classifies as reply to ENQ-NS-2026-001', prior_reference_detected:true, prior_reference_value:'ENQ-NS-2026-001', proceed_to_extraction:false }, action:'Forwarded' },
 
-  s3:  { title:'S3 — Fresh Email Direct to Blade: No Thread Link, Sender Matched', subtitle:'David Mok (NewClient Singapore Pte Ltd) · carmen.l@ingear-metal.com · 2026-07-01 10:33', status:'Ready for review', statusClass:'pill-green', mailbox:'carmen.l@ingear-metal.com', from:'David Mok <david.m@newclient-sg.com>', received:'2026-07-01 10:33', subject:'Hi, just to add to my earlier inquiry — material is HSS M2, qty 50 pcs', body:'Hi,\n\nJust to add to my earlier inquiry — material is HSS M2, quantity 50 pcs.\n\nDavid Mok\nNewClient Singapore Pte Ltd', extractionStatus:'Complete — auto-linked to ENQ-NS-2026-001 via sender match (conf. 0.85)', extractionClass:'pill-green', fields:[['No In-Reply-To','(none)','—'],['No References','(none)','—'],['S1 — Reference number','No ENQ/QT in body — FAIL','—'],['S2 — Sender + 1 open QT','david.m@newclient-sg.com → 1 open inquiry: ENQ-NS-2026-001 — AUTO-LINK','0.85'],['Additive phrase detected','"add to my earlier inquiry" — boosting signal (+0.10)','—'],['Material (extracted)','HSS M2',0.92],['Quantity (extracted)','50 pcs',0.97],['Note','S2 halted cascade — auto-link triggered. Rep confirmation prompt sent.','—']], classification:{ intent:'reply', confidence:0.85, intent_reasoning:'Additive language ("add to my earlier inquiry") + sender has 1 open Awaiting Client Info QT → Claude classifies as reply', prior_reference_detected:true, prior_reference_value:'ENQ-NS-2026-001', proceed_to_extraction:false }, action:'SenderMatch' },
+  s3:  { title:'S3 — Fresh Email Direct to Blade: No Thread Link, Sender Matched', subtitle:'David Mok (NewClient Singapore Pte Ltd) · carmen.l@ingear-metal.com · 2026-07-01 10:33', status:'Conflict', statusClass:'pill-amber', mailbox:'carmen.l@ingear-metal.com', from:'David Mok <david.m@newclient-sg.com>', received:'2026-07-01 10:33', subject:'Hi, just to add to my earlier inquiry — material is HSS M2, qty 50 pcs', body:'Hi,\n\nJust to add to my earlier inquiry — material is HSS M2, quantity 50 pcs.\n\nDavid Mok\nNewClient Singapore Pte Ltd', extractionStatus:'Complete — auto-linked to ENQ-NS-2026-001 via sender match (conf. 0.85)', extractionClass:'pill-green', fields:[['No thread headers','No In-Reply-To · No References — no thread link','—'],['Stage 2 (Claude)','intent: reply — "add to my earlier inquiry" = additive phrase → REPLY classification','—'],['Quotation matching — M1','Reference number in body? → No ENQ/QT found — FAIL','—'],['Quotation matching — M2','Sender (david.m@newclient-sg.com) + 1 open QT → ENQ-NS-2026-001 — AUTO-LINK at 0.85','0.85'],['Phrase boost','"add to my earlier inquiry" boosts semantic match confidence +0.10','—'],['Matching result','M2 matched — rep confirmation prompt sent: confirm or unlink','—'],['Rep action','Opens ENQ-NS-2026-001 + this email side-by-side · updates manually','—']], classification:{ intent:'reply', confidence:0.85, intent_reasoning:'Additive language ("add to my earlier inquiry") + sender has 1 open Awaiting Client Info QT → Claude classifies as reply', prior_reference_detected:true, prior_reference_value:'ENQ-NS-2026-001', proceed_to_extraction:false }, action:'SenderMatch' },
 
   s4:  { title:'UC-S4 — Client Sends from Different Email Address', subtitle:'david.m@gmail.com (unknown sender) · Mailbox 3 · 2026-07-01 11:05', status:'Conflict', statusClass:'pill-amber', mailbox:'Mailbox 3 (pending)', from:'david.m@gmail.com (unknown)', received:'2026-07-01 11:05', subject:'Hi, material is HSS M2, qty 50 pcs for the blades inquiry', body:'Hi,\n\nMaterial is HSS M2, qty 50 pcs for the blades inquiry.\n\nDavid M.\ngmail.com', extractionStatus:'Complete — new record created (sender unknown, combined confidence 0.72)', extractionClass:'pill-amber', fields:[['Sender','david.m@gmail.com','—'],['Customer lookup','Not found — different email from any known record','—'],['S1 — Ref number','None — FAIL','—'],['S2 — Sender match','FAIL — gmail unknown','—'],['S3 — Domain match','gmail.com — no known customer domain match','0.00'],['S4 — Name signature','"David M." → fuzzy → David Mok (NewClient SG)','0.65'],['S5 — Semantic similarity','"HSS M2, blades inquiry" → ENQ-NS-2026-001 missing fields','0.72'],['Combined signal','0.72 — below 0.85 auto-link threshold','—'],['Action','New record created + rep disambiguation alert shown','—']], classification:{ intent:'ambiguous', confidence:0.72, intent_reasoning:'Mixed signals — product content present, unknown sender, name/semantic match to prior inquiry → ambiguous defaults to REPLY per routing rule', prior_reference_detected:true, prior_reference_value:'ENQ-NS-2026-001 (possible)', proceed_to_extraction:false }, action:'UnknownSender' },
 
-  qa:  { title:'UC-QA — Rep Entered Data Manually: Field Lock & Conflict Resolution', subtitle:'Kim Tae-yang (Seoul Blades Co.) · Mailbox 2 · 2026-07-01 13:45', status:'Conflict', statusClass:'pill-amber', mailbox:'Mailbox 2 (pending)', from:'Kim Tae-yang <ty.kim@seoulblades.kr>', received:'2026-07-01 13:45', subject:'Additional info for blade inquiry — material HSS M42 (not M2), quantity 80 pcs', body:'Hi Carmen,\n\nSorry — correction on my earlier info. The material should be HSS M42 (not M2), and quantity is 80 pcs.\n\nTae-yang', extractionStatus:'Extracted — field-level lock applied · 1 conflict on Material', extractionClass:'pill-amber', fields:[['System rule','AI extracts every email regardless of rep activity — always','—'],['material (rep entered)','HSS M2 → field_locked = true','—'],['material (AI extracted)','HSS M42 → stored in ai_parallel_value (conflict ≠ rep value)','—'],['quantity (rep not entered)','Not locked → AI wrote 80 pcs directly to field','—'],['OD (rep entered)','80mm → field_locked = true','—'],['OD (AI extracted)','80mm → same → logged as confirmation, no alert','—'],['Field lock rule','Per-field, not per-quotation — only rep-touched fields are locked','—'],['Note','Rep resolves material conflict in the quotation form. Non-blocking.','—']], classification:{ intent:'reply', confidence:0.95, intent_reasoning:'Correction language ("not M2, should be M42") + sender has open Awaiting Client Info QT → clearly a reply', prior_reference_detected:true, prior_reference_value:'ENQ-SBC-2026-011', proceed_to_extraction:false }, action:'ManualConflict' },
+  qa:  { title:'UC-QA — Rep Entered Data Manually: Field Lock & Conflict Resolution', subtitle:'Kim Tae-yang (Seoul Blades Co.) · Mailbox 2 · 2026-07-01 13:45', status:'Conflict', statusClass:'pill-amber', mailbox:'Mailbox 2 (pending)', from:'Kim Tae-yang <ty.kim@seoulblades.kr>', received:'2026-07-01 13:45', subject:'Additional info for blade inquiry — material HSS M42 (not M2), quantity 80 pcs', body:'Hi Carmen,\n\nSorry — correction on my earlier info. The material should be HSS M42 (not M2), and quantity is 80 pcs.\n\nTae-yang', extractionStatus:'Extracted — field-level lock applied · 1 conflict on Material', extractionClass:'pill-amber', fields:[['System rule','AI extracts every email regardless of rep activity — always','—'],['field_locked','Per-field, not per-quotation — only rep-touched fields are protected','—'],['material (rep entered)','HSS M2 → field_locked=true · field_source=rep_manual','—'],['material (AI extracted)','HSS M42 → ai_parallel_value=HSS M42 · ai_extracted_value=HSS M42 (conflict)','—'],['quantity (not entered)','field_locked=false → AI wrote 80 pcs · field_source=ai_extraction','—'],['OD (rep entered)','80mm → field_locked=true · AI extracted same → logged as confirmation','—'],['Conflict notice','Non-blocking amber: "AI read HSS M42 from email. You entered HSS M2. Which is correct?"','—'],['Override','If rep changes to HSS M42: field_source=rep_override_of_ai · override_reason required','—']], classification:{ intent:'reply', confidence:0.95, intent_reasoning:'Correction language ("not M2, should be M42") + sender has open Awaiting Client Info QT → clearly a reply', prior_reference_detected:true, prior_reference_value:'ENQ-SBC-2026-011', proceed_to_extraction:false }, action:'ManualConflict' },
 
   qb:  { title:'UC-QB — AI Cannot Match: New Record Created, Rep Alert Shown', subtitle:'david.m@gmail.com (no match) · Mailbox 3 · 2026-07-01 14:22', status:'Conflict', statusClass:'pill-amber', mailbox:'Mailbox 3 (pending)', from:'david.m@gmail.com', received:'2026-07-01 14:22', subject:'Following up on my previous email about OD 80mm blades — any update?', body:'Hi,\n\nFollowing up on my previous email about OD 80mm blades. Any update on the quote?\n\nDavid', extractionStatus:'Partial — new record created (no matching strategy reached threshold)', extractionClass:'pill-amber', fields:[['S1 — Ref number','None in body — FAIL','—'],['S2 — Sender + open QT','david.m@gmail.com not in directory — FAIL','—'],['S3 — Semantic (phrase boost)','"following up" boosted by +0.10 but total score 0.68 — below 0.85','0.68'],['S4 — Rep manual link','Not yet performed','—'],['System action','New quotation record created — never discards an email','—'],['Design principle','False separation recoverable · false merge harmful · rep is the merge gate','—'],['Rep alert','Shown: 1 open Awaiting Client Info inquiry from a possible match (conf. 68%)','—']], classification:{ intent:'ambiguous', confidence:0.68, intent_reasoning:'"Following up" phrase + product content → ambiguous → defaults to REPLY per routing rule; no confident match found', prior_reference_detected:false, prior_reference_value:null, proceed_to_extraction:false }, action:'NoMatchNew' }
 
 };
+
+// ── ENQ / QT reference → UC case routing ────────────────────────────────────
+// Maps known inquiry/quotation references to their UC case key in the prototype
+var ENQ_TO_UC = {
+  'ENQ-NS-2026-001': 's3',   // David Mok — Awaiting Client Info (sender-matched case)
+  'ENQ-SBC-2026-011': 'qa',  // Kim Tae-yang — field lock conflict case
+  'QT-2640002': 'c2',        // Carlos Mendes — revision reference
+  'QT-2639100': 'c6',        // Henrik Olsen — reorder
+};
+
+function openUCByEnq(enqId){
+  var ucKey = ENQ_TO_UC[enqId];
+  if (ucKey){
+    openUC(ucKey);
+  } else {
+    // Fallback: go to AI Inquiry Drafts and highlight by scrolling
+    showPage('page-drafts');
+  }
+}
+
+// ── Revision/Reference action handlers ───────────────────────────────────────
+
 
 function openUC(key){
   currentUCKey = key;
@@ -3064,7 +3476,7 @@ function openUC(key){
   var footerCTA = document.getElementById('ucFooterCTA');
   // Hide CTA for: Noise (no inquiry), Mixed (each item has its own button), ManualConflict (info only),
   // and all Revision/Reference outcomes — no extraction ran, no new QT should be created
-  var revRefActions = ['Noise','Mixed','ManualConflict','Forwarded','SenderMatch','UnknownSender','NoMatchNew','Revision','Reorder'];
+  var revRefActions = ['Noise','Mixed','ManualConflict','Forwarded','Revision','Reorder'];
   if (footerCTA) footerCTA.style.display = (revRefActions.indexOf(d.action) >= 0) ? 'none' : '';
 
   // Fill follow-up email text if applicable
@@ -3138,6 +3550,7 @@ function showPage(id){
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   if (id === 'page-list') document.getElementById('navQuotationMgmt').classList.add('active');
   if (id === 'page-drafts') document.getElementById('navDrafts').classList.add('active');
+  if (id === 'page-list') renderQuotationMgmt();
   if (id === 'page-equip'){ document.getElementById('navEquipQuotations').classList.add('active'); renderEquipQuotations(); }
   window.scrollTo(0,0);
 }
@@ -3404,7 +3817,47 @@ function validateRequired(rootId){
   return invalid;
 }
 
+function autoCreateBladeDraft(){
+  // Auto-create a Quotation Mgmt record from the current form state
+  // Called before any status change if no draft has been explicitly saved yet
+  if (currentDraftId) return; // already exists
+  if (!currentUCKey) return;
+  var fd2 = UC_FORM_DATA[currentUCKey] || {};
+  var customerEl = document.querySelector('#page-detail [data-field="customer"]');
+  var enquiryEl  = document.querySelector('#page-detail [data-field="enquiryRef"]');
+  var firstItem  = document.querySelector('#productItems .product-card .product-name');
+  var t = new Date();
+  var ts = t.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) + ' ' + t.toLocaleTimeString('en-GB', {hour12:false, hour:'2-digit', minute:'2-digit'});
+  var rec = {
+    id: makeDraftId(currentUCKey),
+    ucKey: currentUCKey,
+    draftType: 'blade',
+    customer: customerEl ? customerEl.value.split('(')[0].trim() : (fd2.customer || '—'),
+    company:  fd2.company || '—',
+    enquiryRef: enquiryEl ? enquiryEl.value : (fd2.enquiryRef || '—'),
+    product: firstItem ? firstItem.textContent.trim() : '—',
+    status: 'Draft',
+    statusClass: 'pill-gray',
+    savedAt: ts,
+    updatedAt: ts
+  };
+  currentDraftId = rec.id;
+  quotationDrafts.push(rec);
+}
+
+function updateBladeDraftStatus(status, statusClass){
+  if (!currentDraftId) return;
+  var idx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+  if (idx >= 0){
+    quotationDrafts[idx].status = status;
+    quotationDrafts[idx].statusClass = statusClass;
+  }
+}
+
 function submitForReview(){
+  // Ensure a Quotation Mgmt record exists before any status change
+  autoCreateBladeDraft();
+
   if (submissionStage === 'review'){
     var invalid = validateRequired('page-detail');
     var banner = document.getElementById('bladeValidationBanner');
@@ -3418,11 +3871,12 @@ function submitForReview(){
 
     var btn = document.getElementById('primaryActionBtn');
     btn.disabled = true;
-    document.getElementById('headerSpinner').classList.remove('hidden');
+    var bSave = document.getElementById('bladeSaveBtn'); if (bSave) bSave.style.display = 'none';
     setBilingualText(document.getElementById('headerStatus'), 'Awaiting Pricing', '待定价');
     document.getElementById('headerStatus').className = 'status-pill pill-amber';
     lockFormFields('page-detail', true);
     renderStepper('bladeStepperHost', 1);
+    updateBladeDraftStatus('Awaiting Pricing', 'pill-amber'); syncAllViews();
 
     // Runs in the background — no sync-mechanics UI; the rep just sees the status above update.
     setTimeout(onPricingReceived, 2200);
@@ -3431,6 +3885,12 @@ function submitForReview(){
     submissionStage = 'submitted';
     setBilingualText(document.getElementById('headerStatus'), 'Pending Sales Review', '待业务审核');
     document.getElementById('headerStatus').className = 'status-pill pill-blue';
+    updateBladeDraftStatus('Pending Sales Review', 'pill-blue');
+    if (currentDraftId){
+      var sIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+      if (sIdx >= 0){ quotationDrafts[sIdx].bladeStage = 'submitted'; quotationDrafts[sIdx].ackDone = true; }
+    }
+    syncAllViews();
     var btn2 = document.getElementById('primaryActionBtn');
     setBilingualText(btn2, 'Submitted', '已提交');
     btn2.disabled = true;
@@ -3475,8 +3935,7 @@ function submitForReview(){
         currentDraftId = newRec.id;
         quotationDrafts.push(newRec);
       }
-      renderQuotationMgmt();
-      if (currentUCKey) renderInquiryQuotations(currentUCKey);
+      syncAllViews();
     }
   }
 }
@@ -3522,6 +3981,20 @@ function onPricingReceived(){
   document.getElementById('headerSpinner').classList.add('hidden');
   setBilingualText(document.getElementById('headerStatus'), 'Priced — review needed', '已定价，待审核');
   document.getElementById('headerStatus').className = 'status-pill pill-blue';
+  updateBladeDraftStatus('Priced — review needed', 'pill-blue');
+  // Persist CS data + stage on the record for state restoration
+  if (currentDraftId){
+    var dIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+    if (dIdx >= 0){
+      quotationDrafts[dIdx].bladeStage = 'priced';
+      quotationDrafts[dIdx].csData = {
+        material: 'EUR 6.50', labor: 'EUR 2.80', equipment: 'EUR 1.10',
+        overhead: 'EUR 0.58', total: 'EUR 10.98', margin: '30% (+EUR 3.30)',
+        suggested: 'EUR 14.28'
+      };
+    }
+  }
+  syncAllViews();
 
   document.getElementById('diffCard').classList.remove('hidden');
   document.getElementById('ackBox').disabled = false;
@@ -3548,8 +4021,13 @@ function onOverrideInput(){
 }
 
 function onAckChange(){
-  const checked = document.getElementById('ackBox').checked;
+  var checked = document.getElementById('ackBox').checked;
   document.getElementById('primaryActionBtn').disabled = !checked;
+  // Persist ack state on the draft record
+  if (currentDraftId){
+    var dIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+    if (dIdx >= 0) quotationDrafts[dIdx].ackDone = checked;
+  }
 }
 
 function bindGlobalOverrideTracking(){
