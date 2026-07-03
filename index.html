@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
 <title>Blade KB — Quotation Mgmt (Prototype)</title>
 <style>
   :root{
@@ -1335,7 +1334,10 @@
 
       <div class="search-bar"><span>&#128269;</span><span data-en="搜尋客戶、報價編號..." data-zh="搜寻客户、报价编号…">搜尋客戶、報價編號...</span></div>
 
-      <div class="empty-state">
+      <!-- Dynamic equipment quotation records (from AI Inquiry Drafts) -->
+      <div id="equipQuotationRecords"></div>
+
+      <div class="empty-state" id="equipEmptyState">
         <div class="ic">&#128196;</div>
         <div data-en="No equipment quotations yet" data-zh="尚未建立任何設備報價單">No equipment quotations yet</div>
         <div style="margin-top:14px;">
@@ -2078,9 +2080,10 @@ function updateDraftRowStatus(ucKey, statusText, statusClass, statusZh){
 function renderQuotationMgmt(){
   var container = document.getElementById('quotationMgmtRecords');
   if (!container) return;
-  if (!quotationDrafts.length){ container.innerHTML = ''; return; }
+  var bladeDrafts = quotationDrafts.filter(function(r){ return r.draftType !== 'equipment'; });
+  if (!bladeDrafts.length){ container.innerHTML = ''; return; }
   var html = '';
-  quotationDrafts.forEach(function(r){
+  bladeDrafts.forEach(function(r){
     var pillClass = r.statusClass || 'pill-gray';
     html += [
       '<div class="card" style="cursor:pointer;" onclick="openExistingDraft(\'' + r.id + '\')">',
@@ -2211,17 +2214,58 @@ function openExistingDraft(draftId){
   if (!draft) return;
   currentDraftId = draftId;
   currentUCKey = draft.ucKey;
-  openQuotationDetail('blade', false);
-  // After form loads, mark it clearly as resuming an existing draft
-  setTimeout(function(){
-    var headerStatus = document.getElementById('headerStatus');
-    var savedAt2 = document.getElementById('bladeSavedAt');
-    if (headerStatus && draft.status === 'Draft'){
-      setBilingualText(headerStatus, 'Draft saved', '草稿已保存');
-      headerStatus.className = 'status-pill pill-gray';
-    }
-    if (savedAt2) savedAt2.textContent = (lang === 'en' ? 'Resuming saved draft · ' : '继续保存的草稿 · ') + draft.savedAt;
-  }, 50);
+  if (draft.draftType === 'equipment'){
+    openEquipmentDetail();
+    setTimeout(function(){
+      var equipSaved = document.getElementById('equipSavedAt');
+      if (equipSaved) equipSaved.textContent = (lang === 'en' ? 'Resuming saved draft · ' : '继续保存的草稿 · ') + draft.savedAt;
+    }, 50);
+  } else {
+    openQuotationDetail('blade', false);
+    setTimeout(function(){
+      var headerStatus = document.getElementById('headerStatus');
+      var savedAt2 = document.getElementById('bladeSavedAt');
+      if (headerStatus && draft.status === 'Draft'){
+        setBilingualText(headerStatus, 'Draft saved', '草稿已保存');
+        headerStatus.className = 'status-pill pill-gray';
+      }
+      if (savedAt2) savedAt2.textContent = (lang === 'en' ? 'Resuming saved draft · ' : '继续保存的草稿 · ') + draft.savedAt;
+    }, 50);
+  }
+}
+
+function renderEquipQuotations(){
+  var container = document.getElementById('equipQuotationRecords');
+  var emptyState = document.getElementById('equipEmptyState');
+  if (!container) return;
+  var equipDrafts = quotationDrafts.filter(function(r){ return r.draftType === 'equipment'; });
+  if (!equipDrafts.length){
+    container.innerHTML = '';
+    if (emptyState) emptyState.style.display = '';
+    return;
+  }
+  if (emptyState) emptyState.style.display = 'none';
+  var html = '';
+  equipDrafts.forEach(function(r){
+    var pillClass = r.statusClass || 'pill-gray';
+    html += '<div class="card" style="cursor:pointer;" onclick="openExistingDraft(\'' + r.id + '\')">' +
+      '<div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;">' +
+        '<div>' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
+            '<span style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;background:var(--bg-card-2);border:1px solid var(--border-strong);border-radius:5px;padding:2px 7px;color:var(--text-secondary);">' + r.id + '</span>' +
+            '<span style="font-size:13px;font-weight:600;">' + r.customer + '</span>' +
+            '<span style="font-size:12px;color:var(--text-secondary);">&nbsp;(' + r.company + ')</span>' +
+            '<span class="origin-tag">from AI Inquiry Drafts</span>' +
+          '</div>' +
+          '<div style="font-size:11.5px;color:var(--text-secondary);">' +
+            r.enquiryRef + ' &nbsp;&middot;&nbsp; ' + r.product + ' &nbsp;&middot;&nbsp; <span style="color:var(--text-muted);">saved ' + r.savedAt + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div style="flex-shrink:0;"><span class="status-pill ' + pillClass + '">' + r.status + '</span></div>' +
+      '</div>' +
+    '</div>';
+  });
+  container.innerHTML = html;
 }
 
 function saveDraft(type){
@@ -2238,6 +2282,40 @@ function saveDraft(type){
       setTimeout(function(){ toast.classList.add('fade'); setTimeout(function(){ toast.classList.remove('show','fade'); }, 800); }, 1800);
     }
     if (savedAt) savedAt.textContent = (lang === 'en' ? 'Last saved ' : '最后保存 ') + dateTimeStr;
+
+    if (!currentUCKey) return;
+
+    // Build equipment record
+    var fd = UC_FORM_DATA[currentUCKey] || {};
+    var firstEquipItem = document.querySelector('#equipmentItems .product-card .product-name');
+    var rec = {
+      ucKey: currentUCKey,
+      draftType: 'equipment',
+      customer: fd.customer ? fd.customer.split('(')[0].trim() : '—',
+      company: fd.company || '—',
+      enquiryRef: fd.enquiryRef || '—',
+      product: firstEquipItem ? firstEquipItem.textContent.trim() : 'Equipment',
+      status: 'Draft',
+      statusClass: 'pill-gray',
+      savedAt: dateTimeStr,
+      updatedAt: dateTimeStr
+    };
+
+    if (currentDraftId){
+      var idx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+      if (idx >= 0){ rec.id = currentDraftId; quotationDrafts[idx] = rec; }
+    } else {
+      rec.id = makeDraftId(currentUCKey);
+      currentDraftId = rec.id;
+      quotationDrafts.push(rec);
+    }
+
+    var hasEquipSubmitted = quotationDrafts.some(function(r){ return r.ucKey === currentUCKey && r.status === 'Pending Sales Review'; });
+    if (!hasEquipSubmitted) updateDraftRowStatus(currentUCKey, 'Draft', 'pill-gray', '草稿');
+
+    renderEquipQuotations();
+    renderQuotationMgmt();
+    renderInquiryQuotations(currentUCKey);
     return;
   }
 
@@ -2258,16 +2336,17 @@ function saveDraft(type){
 
   if (!currentUCKey) return;
 
-  // Build record data
-  var fd = UC_FORM_DATA[currentUCKey] || {};
+  // Build blade record
+  var fd2 = UC_FORM_DATA[currentUCKey] || {};
   var customerNameEl = document.querySelector('#page-detail [data-field="customer"]');
   var enquiryRefEl = document.querySelector('#page-detail [data-field="enquiryRef"]');
   var firstItem = document.querySelector('#productItems .product-card .product-name');
-  var rec = {
+  var rec2 = {
     ucKey: currentUCKey,
-    customer: customerNameEl ? customerNameEl.value.split('(')[0].trim() : (fd.customer || '—'),
-    company: fd.company || '—',
-    enquiryRef: enquiryRefEl ? enquiryRefEl.value : (fd.enquiryRef || '—'),
+    draftType: 'blade',
+    customer: customerNameEl ? customerNameEl.value.split('(')[0].trim() : (fd2.customer || '—'),
+    company: fd2.company || '—',
+    enquiryRef: enquiryRefEl ? enquiryRefEl.value : (fd2.enquiryRef || '—'),
     product: firstItem ? firstItem.textContent.trim() : '—',
     status: 'Draft',
     statusClass: 'pill-gray',
@@ -2276,26 +2355,21 @@ function saveDraft(type){
   };
 
   if (currentDraftId){
-    // Update existing draft
-    var idx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
-    if (idx >= 0){
-      rec.id = currentDraftId;
-      quotationDrafts[idx] = rec;
-    }
+    var idx2 = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+    if (idx2 >= 0){ rec2.id = currentDraftId; quotationDrafts[idx2] = rec2; }
   } else {
-    // Create new draft
-    rec.id = makeDraftId(currentUCKey);
-    currentDraftId = rec.id;
-    quotationDrafts.push(rec);
+    rec2.id = makeDraftId(currentUCKey);
+    currentDraftId = rec2.id;
+    quotationDrafts.push(rec2);
   }
 
-  // Update AI Inquiry Drafts row to "Draft" only if no submitted draft exists yet
   var hasSubmitted = quotationDrafts.some(function(r){ return r.ucKey === currentUCKey && r.status === 'Pending Sales Review'; });
   if (!hasSubmitted) updateDraftRowStatus(currentUCKey, 'Draft', 'pill-gray', '草稿');
 
   renderQuotationMgmt();
   renderInquiryQuotations(currentUCKey);
 }
+
 
 function discardDraft(type){
   var msg = lang === 'en'
@@ -2325,6 +2399,15 @@ function withdrawSubmission(type){
     setBilingualText(btn, 'Submit for Review', '提交审核');
     lockFormFields('page-detail-equip', false);
     renderStepper('equipStepperHost', 0);
+    // Revert draft status → Draft
+    if (currentDraftId){
+      var dIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+      if (dIdx >= 0){ quotationDrafts[dIdx].status = 'Draft'; quotationDrafts[dIdx].statusClass = 'pill-gray'; }
+    }
+    if (currentUCKey) updateDraftRowStatus(currentUCKey, 'Draft', 'pill-gray', '草稿');
+    renderEquipQuotations();
+    renderQuotationMgmt();
+    if (currentUCKey) renderInquiryQuotations(currentUCKey);
     return;
   }
   // blade — works from pricing-returned 'approval' OR final 'submitted' stage.
@@ -2435,6 +2518,34 @@ function submitEquipmentForReview(){
     document.getElementById('equipWithdrawLink').classList.add('hidden');
     document.getElementById('equipConfirmBanner').classList.add('show');
     if (currentUCKey) updateDraftRowStatus(currentUCKey, 'Pending Sales Review', 'pill-blue', '待业务审核');
+
+    // Sync equipment draft record → Pending Sales Review
+    if (currentDraftId){
+      var dIdx = quotationDrafts.findIndex(function(r){ return r.id === currentDraftId; });
+      if (dIdx >= 0){
+        quotationDrafts[dIdx].status = 'Pending Sales Review';
+        quotationDrafts[dIdx].statusClass = 'pill-blue';
+      }
+    } else if (currentUCKey) {
+      // Auto-create record if rep never explicitly saved
+      var fd = UC_FORM_DATA[currentUCKey] || {};
+      var t = new Date();
+      var ts = t.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) + ' ' + t.toLocaleTimeString('en-GB', {hour12:false, hour:'2-digit', minute:'2-digit'});
+      var firstEquipItem = document.querySelector('#equipmentItems .product-card .product-name');
+      var newRec = {
+        id: makeDraftId(currentUCKey), ucKey: currentUCKey, draftType: 'equipment',
+        customer: fd.customer ? fd.customer.split('(')[0].trim() : '—',
+        company: fd.company || '—', enquiryRef: fd.enquiryRef || '—',
+        product: firstEquipItem ? firstEquipItem.textContent.trim() : 'Equipment',
+        status: 'Pending Sales Review', statusClass: 'pill-blue',
+        savedAt: ts, updatedAt: ts
+      };
+      currentDraftId = newRec.id;
+      quotationDrafts.push(newRec);
+    }
+    renderEquipQuotations();
+    renderQuotationMgmt();
+    if (currentUCKey) renderInquiryQuotations(currentUCKey);
     return;
   }
 
@@ -3010,7 +3121,7 @@ function classifyAndProceed(type){
 function ucCreateDraft(){
   var d = currentUCKey ? UC_DATA[currentUCKey] : null;
   if (!d) return;
-  // For ambiguous, use the rep's classified choice
+  currentDraftId = null; // always start a fresh draft record
   if (d.action === 'Ambiguous'){
     if (window._ambiguousChoice === 'equipment') openEquipmentDetail();
     else openQuotationDetail('blade', false);
@@ -3027,7 +3138,7 @@ function showPage(id){
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   if (id === 'page-list') document.getElementById('navQuotationMgmt').classList.add('active');
   if (id === 'page-drafts') document.getElementById('navDrafts').classList.add('active');
-  if (id === 'page-equip') document.getElementById('navEquipQuotations').classList.add('active');
+  if (id === 'page-equip'){ document.getElementById('navEquipQuotations').classList.add('active'); renderEquipQuotations(); }
   window.scrollTo(0,0);
 }
 
